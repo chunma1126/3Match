@@ -17,11 +17,11 @@ public class Board : MonoBehaviour
     
     private int GetBoardWidthSize => boardSize.x;
     private int GetBoardHeightSize => boardSize.y;
-    
+
     private const int TILE_SIZE_WIDTH = 1;
     private const int TILE_SIZE_HEIGHT = 1;
     
-    private const float SWAP_DURATION = 0.5f;
+    private const float SWAP_DURATION = 0.35f;
         
     private bool isMoving = false;
     private Vector2 mousePos;
@@ -64,8 +64,6 @@ public class Board : MonoBehaviour
         
     }
         
-    
-    
     private Tile FindTile()
     {
         return tiles
@@ -77,12 +75,11 @@ public class Board : MonoBehaviour
     private void Update()
     {
         TrySwap();
-                
     }
-
-    private void TrySwap()
+    
+    private bool TrySwap()
     {
-        if(isMoving)return;
+        if(isMoving)return false;
         
         if (Input.GetMouseButtonDown(0))
         {
@@ -107,12 +104,32 @@ public class Board : MonoBehaviour
             FruitSwap();
         }
         
+        return true;
     }
         
     private void FruitSwap()
     {
-        if (currentFruitIndex == -1 || lastFruitIndex == -1) return;
+        if (currentFruitIndex == -1 || lastFruitIndex == -1)
+        {
+            SwapComplete();
+            return;
+        }
+        
+        Swap(() =>
+        {
+            if (TryMatch() == false)
+            {
+                Swap(SwapComplete);
+            }
+            else
+            {
+                SwapComplete();
+            }
+        });
+    }
 
+    private void Swap(Action callback = null)
+    {
         isMoving = true;
         
         Tile tileA = tiles[currentFruitIndex];
@@ -120,7 +137,7 @@ public class Board : MonoBehaviour
 
         Fruit fruitA = tileA.CurrentFruit;
         Fruit fruitB = tileB.CurrentFruit;
-
+        
         tileA.CurrentFruit = fruitB;
         tileB.CurrentFruit = fruitA;
         
@@ -129,11 +146,24 @@ public class Board : MonoBehaviour
         sequence.Join(fruitB.transform.DOLocalMove(Vector3.zero, SWAP_DURATION));
         sequence.AppendCallback(() =>
         {
-            isMoving = false;
+            callback?.Invoke();
         });
-                
+    }
+    
+    private bool TryMatch()
+    {
+        
+        
+        
+        return false;
+    }
+    
+    private void SwapComplete()
+    {
+        isMoving = false;
         currentFruitIndex = -1;
         lastFruitIndex = -1;
     }
+        
     
 }
