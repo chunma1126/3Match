@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class Board : MonoBehaviour
 {
@@ -15,34 +17,41 @@ public class Board : MonoBehaviour
     private Tile[] tiles;
     private Vector2[] tilePositions;
     
-    private int GetBoardWidthSize => boardSize.x;
-    private int GetBoardHeightSize => boardSize.y;
-
+    public int GetBoardWidthSize => boardSize.x;
+    public int GetBoardHeightSize => boardSize.y;
+    
     private const int TILE_SIZE_WIDTH = 1;
     private const int TILE_SIZE_HEIGHT = 1;
     
     private const float SWAP_DURATION = 0.35f;
-        
+    
     private bool isMoving = false;
     private Vector2 mousePos;
     
     private int currentFruitIndex = -1;
     private int lastFruitIndex = -1;
+
+    private Queue<int> fruitQueue = new Queue<int>(10);
+
+    private MatchChecker matchChecker;
     
     private void Awake()
     {
         fruitController = GetComponent<FruitController>();
+       
     }
     
     private void Start()
     {
         CreateTiles();
+        
         fruitController.CreateFruit(tiles);
+        matchChecker = new MatchChecker(boardSize,tiles);
     }
     
     private void Update()
     {
-        TrySwap();
+        SwapProcess();
     }
     
     private void CreateTiles()
@@ -76,15 +85,15 @@ public class Board : MonoBehaviour
             ?.GetComponentInChildren<Tile>();
     }
     
-    private bool TrySwap()
+    private void SwapProcess()
     {
-        if(isMoving)return false;
+        if(isMoving)return;
         
         if (Input.GetMouseButtonDown(0))
         {
             mousePos = Utility.GetMouseWorldPosition();
             Tile currentTile = FindTile();
-            
+
             currentFruitIndex = Array.IndexOf(tilePositions, currentTile.transform.position);
         }
         
@@ -98,42 +107,76 @@ public class Board : MonoBehaviour
         
         bool isAdjacentHorizontally = Mathf.Abs(currentFruitIndex - lastFruitIndex) == 1;
         bool isAdjacentVertically = Mathf.Abs(currentFruitIndex - lastFruitIndex) == GetBoardWidthSize;
-        if (isAdjacentHorizontally || isAdjacentVertically)
+        bool isTileHashFruit = currentFruitIndex != -1 && lastFruitIndex != -1 &&
+                               tiles[currentFruitIndex].CurrentFruit.fruitData.fruitType != FruitType.None &&
+                               tiles[lastFruitIndex].CurrentFruit.fruitData.fruitType != FruitType.None;
+        
+        bool canSwap = isTileHashFruit && (isAdjacentHorizontally || isAdjacentVertically);
+        if (canSwap)
         {
-            FruitSwap();
+            TrySwap();
         }
         
-        return true;
     }
         
-    private void FruitSwap()
+    private void TrySwap()
     {
         if (currentFruitIndex == -1 || lastFruitIndex == -1)
         {
             SwapComplete();
             return;
         }
-        
-        Swap(() =>
+
+        FruitSwap(currentFruitIndex, lastFruitIndex).OnComplete(() =>
         {
             if (TryMatch() == false)
             {
-                Swap(SwapComplete);
+                //swap undo
+                FruitSwap(currentFruitIndex, lastFruitIndex).OnComplete(SwapComplete);
             }
             else
             {
+                //match
+                FruitMatch();
                 SwapComplete();
             }
         });
+            
+           
+        
     }
 
-    private void Swap(Action callback = null)
+    private void FruitMatch()
+    {
+        // Swap must start from the minimum index
+        fruitQueue = new Queue<int>(fruitQueue.OrderBy(i => i));
+        
+        int size = fruitQueue.Count;
+        for (int i = 0; i < size; i++)
+        {
+            int fruitIndex = fruitQueue.Dequeue();
+            RemoveFruitAt(fruitIndex);
+            
+            fruitQueue.Enqueue(fruitIndex);
+        }
+        
+        while (fruitQueue.Count > 0)
+        {
+            int fruitIndex = fruitQueue.Dequeue();
+                        
+            ApplyGravityOnColumn(fruitIndex);
+        }
+        
+        fruitQueue.Clear();
+    }
+
+    private Tween FruitSwap(int currentIndex,int lastIndex)
     {
         isMoving = true;
         
-        Tile tileA = tiles[currentFruitIndex];
-        Tile tileB = tiles[lastFruitIndex];
-
+        Tile tileA = tiles[currentIndex];
+        Tile tileB = tiles[lastIndex];
+        
         Fruit fruitA = tileA.CurrentFruit;
         Fruit fruitB = tileB.CurrentFruit;
         
@@ -143,16 +186,12 @@ public class Board : MonoBehaviour
         Sequence sequence = DOTween.Sequence();
         sequence.Append(fruitA.transform.DOLocalMove(Vector3.zero, SWAP_DURATION));
         sequence.Join(fruitB.transform.DOLocalMove(Vector3.zero, SWAP_DURATION));
-        sequence.AppendCallback(() =>
-        {
-            callback?.Invoke();
-        });
+        
+        return sequence;
     }
     
     private void SwapComplete()
     {
-        Debug.Log("Swap Complete");
-        
         isMoving = false;
         currentFruitIndex = -1;
         lastFruitIndex = -1;
@@ -160,114 +199,33 @@ public class Board : MonoBehaviour
     
     private bool TryMatch()
     {
-        if (CheckHorizontal(currentFruitIndex)) return true;
-        if (CheckHorizontal(lastFruitIndex)) return true;
-        
-        if (CheckVertical(currentFruitIndex)) return true;
-        if (CheckVertical(lastFruitIndex)) return true;
-        
-        return false;
+        return matchChecker.Match(currentFruitIndex,lastFruitIndex,ref fruitQueue);
     }
-
-    private bool CheckHorizontal(int index)
-    {
-        //left
-        {
-            int currentX = index;
-            int left = currentX - 1;
-            int left2 = currentX - 2;
-            
-            if (IsTripleMatch(currentX , left ,left2))
-            {
-                return true;
-            }
-        }
-        
-        //center
-        {
-            int currentX = index;
-            int left = currentX - 1;
-            int right = currentX + 1;
-            
-            if (IsTripleMatch(currentX , left ,right))
-            {
-                return true;
-            }
-        }
-        
-        //Right
-        {
-            int currentX = index;
-            int right1 = currentX + 1;
-            int right2 = currentX + 2;
-            
-            if (IsTripleMatch(currentX , right1 ,right2))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private bool CheckVertical(int index)
-    {
-        //up
-        {
-            int currentY = index;
-            int up1 = currentY - GetBoardWidthSize;
-            int up2 = currentY - GetBoardWidthSize  * 2;
-            
-            if (IsTripleMatch(currentY , up1 ,up2))
-            {
-                return true;
-            }
-        }
-        
-        //center
-        {
-            int currentX = index;
-            int up = currentX - GetBoardWidthSize;
-            int down = currentX + GetBoardWidthSize;
-            
-            if (IsTripleMatch(currentX , up ,down))
-            {
-                return true;
-            }
-        }
-        
-        //Right
-        {
-            int currentX = index;
-            int down = currentX + GetBoardWidthSize;
-            int down2 = currentX + GetBoardWidthSize * 2;
-            
-            if (IsTripleMatch(currentX , down ,down2))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private bool IsTripleMatch(int a, int b, int c)
-    {
-        int maxWidth = tiles.Length;
-        if (a < 0 || b < 0 || c < 0 || a >= maxWidth || b >= maxWidth || c >= maxWidth)
-            return false;
-        
-        var typeA = tiles[a].CurrentFruit.fruitData.fruitType;
-        var typeB = tiles[b].CurrentFruit.fruitData.fruitType;
-        var typeC = tiles[c].CurrentFruit.fruitData.fruitType;
-        
-        bool isMatch = typeA == typeB && typeC == typeC;
-
-        if (isMatch)
-        {
-                        
-        }
-        
-        return isMatch;
-    }
-            
     
+    private void RemoveFruitAt(int index)
+    {
+        FruitData fruitData = new FruitData();
+        fruitData.fruitType = FruitType.None;
+        
+        tiles[index].CurrentFruit.SetData(fruitData);
+    }
+    
+    private void ApplyGravityOnColumn(int index)
+    {
+        int aboveIndex = index - GetBoardWidthSize;
+        
+        if (index < 0 || aboveIndex < 0)
+        {
+            isMoving = false;
+            return;
+        }
+        
+        isMoving = true;
+                
+        FruitSwap(index, aboveIndex).OnComplete(()=>
+        {
+            ApplyGravityOnColumn(aboveIndex);
+        });
+    }
+        
 }

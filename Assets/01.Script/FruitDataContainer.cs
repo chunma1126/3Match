@@ -2,6 +2,7 @@ using UnityEngine;
 
 public enum FruitType
 {
+    None,
     Apple,
     Banana,
     Blueberry,

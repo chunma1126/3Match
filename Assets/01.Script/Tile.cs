@@ -3,7 +3,6 @@
 public class Tile : MonoBehaviour
 {
     private Fruit currentFruit;
-
     public Fruit CurrentFruit
     {
         get => currentFruit;
@@ -12,6 +11,7 @@ public class Tile : MonoBehaviour
             currentFruit = value;
             if (currentFruit != null)
                 currentFruit.transform.SetParent(transform);
+            
         }
     }
 }

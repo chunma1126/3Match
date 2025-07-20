@@ -10,12 +10,21 @@ public class Fruit : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
     
-    public void Initialize(FruitData data)
+    public void SetData(FruitData data)
     {
         fruitData = data;
+
+        if (data.fruitType == FruitType.None)
+        {
+            spriteRenderer.sprite = null;
+        }
+        else
+        {
+            spriteRenderer.sprite = fruitData.fruitSprite;
+        }
         
         gameObject.name = fruitData.fruitType.ToString();
-        spriteRenderer.sprite = fruitData.fruitSprite;
+                
     }
     
 }

@@ -14,7 +14,7 @@ public class FruitController : MonoBehaviour
             Vector2 spawnPos = currentTile.transform.position;
             
             Fruit currentFruit = Instantiate(fruit, spawnPos, Quaternion.identity);
-            currentFruit.Initialize(fruitDatas.fruitData[Random.Range(0 , fruitDatas.fruitData.Length)]);
+            currentFruit.SetData(fruitDatas.fruitData[Random.Range(0 , fruitDatas.fruitData.Length)]);
             
             currentTile.CurrentFruit = currentFruit;
         }
