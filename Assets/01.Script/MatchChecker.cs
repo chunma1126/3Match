@@ -1,5 +1,4 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class MatchChecker
@@ -13,7 +12,7 @@ public class MatchChecker
         this.tiles = tiles;
     }
     
-    public bool Match(int currentFruitIndex , int lastFruitIndex, ref Queue<int> queue)
+    public bool IsMatch(int currentFruitIndex , int lastFruitIndex, ref Queue<int> queue)
     {
         if (CheckHorizontal(currentFruitIndex,ref queue)) return true;
         if (CheckHorizontal(lastFruitIndex,ref queue)) return true;
@@ -26,41 +25,39 @@ public class MatchChecker
     
     private bool CheckHorizontal(int index , ref Queue<int> queue)
     {
-        //left
+        int width = boardSize.x; 
+        int x = index % width;
+        
+        // left (x-2, x-1, x)
+        if (x >= 2)
         {
-            int currentX = index;
-            int left = currentX - 1;
-            int left2 = currentX - 2;
-            
-            if (IsTripleMatch(currentX , left ,left2,ref queue))
-            {
+            int i1 = index - 2;
+            int i2 = index - 1;
+            int i3 = index;
+            if (IsTripleMatch(i1, i2, i3, ref queue))
                 return true;
-            }
+        }
+
+        // center (x-1, x, x+1)
+        if (x >= 1 && x + 1 < width)
+        {
+            int i1 = index - 1;
+            int i2 = index;
+            int i3 = index + 1;
+            if (IsTripleMatch(i1, i2, i3, ref queue))
+                return true;
+        }
+
+        // right (x, x+1, x+2)
+        if (x + 2 < width)
+        {
+            int i1 = index;
+            int i2 = index + 1;
+            int i3 = index + 2;
+            if (IsTripleMatch(i1, i2, i3, ref queue))
+                return true;
         }
         
-        //center
-        {
-            int currentX = index;
-            int left = currentX - 1;
-            int right = currentX + 1;
-            
-            if (IsTripleMatch(currentX , left ,right,ref queue))
-            {
-                return true;
-            }
-        }
-        
-        //Right
-        {
-            int currentX = index;
-            int right1 = currentX + 1;
-            int right2 = currentX + 2;
-            
-            if (IsTripleMatch(currentX , right1 ,right2,ref queue))
-            {
-                return true;
-            }
-        }
         return false;
     }
 

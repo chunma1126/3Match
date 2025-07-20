@@ -13,13 +13,13 @@ public class Board : MonoBehaviour
     [Header("Prefab info")]
     [SerializeField] private Tile[] tilePrefabs;
     
-    private FruitController fruitController;
-    private Tile[] tiles;
-    private Vector2[] tilePositions;
-    
     public int GetBoardWidthSize => boardSize.x;
     public int GetBoardHeightSize => boardSize.y;
     
+    private FruitController fruitController;
+    private Tile[] tiles;
+    private Vector2[] tilePositions;
+        
     private const int TILE_SIZE_WIDTH = 1;
     private const int TILE_SIZE_HEIGHT = 1;
     
@@ -30,15 +30,14 @@ public class Board : MonoBehaviour
     
     private int currentFruitIndex = -1;
     private int lastFruitIndex = -1;
-
+    
     private Queue<int> fruitQueue = new Queue<int>(10);
-
+        
     private MatchChecker matchChecker;
     
     private void Awake()
     {
         fruitController = GetComponent<FruitController>();
-       
     }
     
     private void Start()
@@ -76,7 +75,7 @@ public class Board : MonoBehaviour
             return y * boardSize.x + x;
         }
     }
-        
+    
     private Tile FindTile()
     {
         return tiles
@@ -126,24 +125,23 @@ public class Board : MonoBehaviour
             SwapComplete();
             return;
         }
-
+        
         FruitSwap(currentFruitIndex, lastFruitIndex).OnComplete(() =>
         {
-            if (TryMatch() == false)
-            {
-                //swap undo
-                FruitSwap(currentFruitIndex, lastFruitIndex).OnComplete(SwapComplete);
-            }
-            else
+            if (TryMatch())
             {
                 //match
                 FruitMatch();
                 SwapComplete();
+                
+            }
+            else
+            {
+                //swap undo
+                FruitSwap(currentFruitIndex, lastFruitIndex).OnComplete(SwapComplete);
             }
         });
-            
-           
-        
+                
     }
 
     private void FruitMatch()
@@ -151,7 +149,7 @@ public class Board : MonoBehaviour
         // Swap must start from the minimum index
         fruitQueue = new Queue<int>(fruitQueue.OrderBy(i => i));
         
-        int size = fruitQueue.Count;
+        int size = fruitQueue.Count - 1;
         for (int i = 0; i < size; i++)
         {
             int fruitIndex = fruitQueue.Dequeue();
@@ -160,14 +158,21 @@ public class Board : MonoBehaviour
             fruitQueue.Enqueue(fruitIndex);
         }
         
-        while (fruitQueue.Count > 0)
+        int index = fruitQueue.Dequeue();
+        RemoveFruitAt(index).OnComplete(() =>
         {
-            int fruitIndex = fruitQueue.Dequeue();
+            while (fruitQueue.Count > 0)
+            {
+                int fruitIndex = fruitQueue.Dequeue();
                         
-            ApplyGravityOnColumn(fruitIndex);
-        }
+                ApplyGravityOnColumn(fruitIndex);
+            }
         
-        fruitQueue.Clear();
+            fruitQueue.Clear();
+        });
+        
+        fruitQueue.Enqueue(index);
+                
     }
 
     private Tween FruitSwap(int currentIndex,int lastIndex)
@@ -199,15 +204,15 @@ public class Board : MonoBehaviour
     
     private bool TryMatch()
     {
-        return matchChecker.Match(currentFruitIndex,lastFruitIndex,ref fruitQueue);
+        return matchChecker.IsMatch(currentFruitIndex,lastFruitIndex,ref fruitQueue);
     }
     
-    private void RemoveFruitAt(int index)
+    private Tween RemoveFruitAt(int index)
     {
         FruitData fruitData = new FruitData();
         fruitData.fruitType = FruitType.None;
         
-        tiles[index].CurrentFruit.SetData(fruitData);
+        return tiles[index].CurrentFruit.SetData(fruitData);
     }
     
     private void ApplyGravityOnColumn(int index)
@@ -217,11 +222,12 @@ public class Board : MonoBehaviour
         if (index < 0 || aboveIndex < 0)
         {
             isMoving = false;
+            
             return;
         }
         
         isMoving = true;
-                
+        
         FruitSwap(index, aboveIndex).OnComplete(()=>
         {
             ApplyGravityOnColumn(aboveIndex);

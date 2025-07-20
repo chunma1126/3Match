@@ -103,3 +103,5 @@ MonoBehaviour:
   fruitData:
     fruitType: 0
     fruitSprite: {fileID: 0}
+  scaleSize: 0.59
+  scaleDuration: 0.307
