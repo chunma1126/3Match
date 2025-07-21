@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class MatchChecker
 {
@@ -11,19 +10,34 @@ public class MatchChecker
         this.boardSize = boardSize;
         this.tiles = tiles;
     }
-    
-    public bool IsMatch(int currentFruitIndex , int lastFruitIndex, ref Queue<int> queue)
+
+    public void CheckAllTiles(ref UniqueQueue<int> queue)
     {
-        if (CheckHorizontal(currentFruitIndex,ref queue)) return true;
-        if (CheckHorizontal(lastFruitIndex,ref queue)) return true;
+        for (int y = 0; y < boardSize.y; y++)
+        {
+            for (int x = 0; x < boardSize.x; x++)
+            {
+                int index = y * boardSize.x + x;
+                
+                CheckHorizontal(index, ref queue);
+                CheckVertical(index, ref queue);
+            }
+        }
         
-        if (CheckVertical(currentFruitIndex,ref queue)) return true;
-        if (CheckVertical(lastFruitIndex,ref queue)) return true;
-        
-        return false;
     }
     
-    private bool CheckHorizontal(int index , ref Queue<int> queue)
+    public bool IsMatch(int currentFruitIndex , int lastFruitIndex, ref UniqueQueue<int> queue)
+    {
+        bool checkHorizontal1 = CheckHorizontal(currentFruitIndex, ref queue);
+        bool checkHorizontal2 = CheckHorizontal(lastFruitIndex,ref queue);
+        
+        bool checkVertical1 = CheckVertical(currentFruitIndex,ref queue);
+        bool checkVertical2 = CheckVertical(lastFruitIndex, ref queue);
+        
+        return checkHorizontal1 | checkHorizontal2 | checkVertical1 | checkVertical2;
+    }
+    
+    private bool CheckHorizontal(int index , ref UniqueQueue<int> queue)
     {
         int width = boardSize.x; 
         int x = index % width;
@@ -61,7 +75,7 @@ public class MatchChecker
         return false;
     }
 
-    private bool CheckVertical(int index, ref Queue<int> queue)
+    private bool CheckVertical(int index, ref UniqueQueue<int> queue)
     {
         //up
         {
@@ -101,7 +115,7 @@ public class MatchChecker
         return false;
     }
     
-    private bool IsTripleMatch(int a, int b, int c, ref Queue<int> queue)
+    private bool IsTripleMatch(int a, int b, int c, ref UniqueQueue<int> queue)
     {
         int maxWidth = tiles.Length;
         if (a < 0 || b < 0 || c < 0 || a >= maxWidth || b >= maxWidth || c >= maxWidth)
@@ -122,5 +136,5 @@ public class MatchChecker
         
         return isMatch;
     }
-    
+        
 }

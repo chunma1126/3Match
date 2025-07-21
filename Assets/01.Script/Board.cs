@@ -1,9 +1,9 @@
-using System;
-using System.Collections.Generic;
+using UnityEngine;
 using System.Linq;
 using DG.Tweening;
-using UnityEngine;
-using UnityEngine.Networking;
+using System;
+using System.Collections.Generic;
+using UnityEngine.Rendering;
 
 public class Board : MonoBehaviour
 {
@@ -19,11 +19,11 @@ public class Board : MonoBehaviour
     private FruitController fruitController;
     private Tile[] tiles;
     private Vector2[] tilePositions;
-        
+    
     private const int TILE_SIZE_WIDTH = 1;
     private const int TILE_SIZE_HEIGHT = 1;
     
-    private const float SWAP_DURATION = 0.35f;
+    private const float SWAP_DURATION = 0.23f;
     
     private bool isMoving = false;
     private Vector2 mousePos;
@@ -31,8 +31,7 @@ public class Board : MonoBehaviour
     private int currentFruitIndex = -1;
     private int lastFruitIndex = -1;
     
-    private Queue<int> fruitQueue = new Queue<int>(10);
-        
+    private UniqueQueue<int> fruitQueue = new UniqueQueue<int>(10);
     private MatchChecker matchChecker;
     
     private void Awake()
@@ -46,6 +45,10 @@ public class Board : MonoBehaviour
         
         fruitController.CreateFruit(tiles);
         matchChecker = new MatchChecker(boardSize,tiles);
+
+        MatchAllTiles();
+        
+        
     }
     
     private void Update()
@@ -115,30 +118,28 @@ public class Board : MonoBehaviour
         {
             TrySwap();
         }
-        
+                
     }
         
     private void TrySwap()
     {
         if (currentFruitIndex == -1 || lastFruitIndex == -1)
         {
-            SwapComplete();
+            ResetFruitIndex();
             return;
         }
         
         FruitSwap(currentFruitIndex, lastFruitIndex).OnComplete(() =>
         {
-            if (TryMatch())
+            if (matchChecker.IsMatch(currentFruitIndex,lastFruitIndex,ref fruitQueue))
             {
                 //match
                 FruitMatch();
-                SwapComplete();
-                
             }
             else
             {
                 //swap undo
-                FruitSwap(currentFruitIndex, lastFruitIndex).OnComplete(SwapComplete);
+                FruitSwap(currentFruitIndex, lastFruitIndex).OnComplete(ResetFruitIndex);
             }
         });
                 
@@ -146,33 +147,51 @@ public class Board : MonoBehaviour
 
     private void FruitMatch()
     {
+        if(fruitQueue == null || fruitQueue.Count <= 0)return;
+        
         // Swap must start from the minimum index
-        fruitQueue = new Queue<int>(fruitQueue.OrderBy(i => i));
+        fruitQueue = new UniqueQueue<int>(fruitQueue.OrderBy(i => i));
         
         int size = fruitQueue.Count - 1;
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i <size; i++)
         {
             int fruitIndex = fruitQueue.Dequeue();
             RemoveFruitAt(fruitIndex);
-            
-            fruitQueue.Enqueue(fruitIndex);
+            fruitQueue.Enqueue(fruitIndex); 
         }
         
-        int index = fruitQueue.Dequeue();
-        RemoveFruitAt(index).OnComplete(() =>
+        int lastIndex = fruitQueue.Dequeue();
+        fruitQueue.Enqueue(lastIndex); 
+                
+        RemoveFruitAt(lastIndex).OnComplete(() =>
         {
-            while (fruitQueue.Count > 0)
+            int total = fruitQueue.Count;
+            int completed = 0;
+            
+            foreach (int index in fruitQueue)
             {
-                int fruitIndex = fruitQueue.Dequeue();
-                        
-                ApplyGravityOnColumn(fruitIndex);
+                ApplyGravity(index, () =>
+                {
+                    completed = GravityComplete(completed, total);
+                });
             }
-        
-            fruitQueue.Clear();
+            
+            fruitQueue.Clear(); 
         });
         
-        fruitQueue.Enqueue(index);
-                
+    }
+
+    private int GravityComplete(int completed, int total)
+    {
+        completed++;
+        if (completed >= total)
+        {
+            completed = 0;
+            MatchAllTiles();
+            ResetFruitIndex();
+        }
+        
+        return completed;
     }
 
     private Tween FruitSwap(int currentIndex,int lastIndex)
@@ -195,18 +214,13 @@ public class Board : MonoBehaviour
         return sequence;
     }
     
-    private void SwapComplete()
+    private void ResetFruitIndex()
     {
         isMoving = false;
         currentFruitIndex = -1;
         lastFruitIndex = -1;
     }
-    
-    private bool TryMatch()
-    {
-        return matchChecker.IsMatch(currentFruitIndex,lastFruitIndex,ref fruitQueue);
-    }
-    
+        
     private Tween RemoveFruitAt(int index)
     {
         FruitData fruitData = new FruitData();
@@ -215,23 +229,29 @@ public class Board : MonoBehaviour
         return tiles[index].CurrentFruit.SetData(fruitData);
     }
     
-    private void ApplyGravityOnColumn(int index)
+    private void ApplyGravity(int index,Action callback = null)
     {
         int aboveIndex = index - GetBoardWidthSize;
         
         if (index < 0 || aboveIndex < 0)
         {
-            isMoving = false;
+            callback?.Invoke();
             
             return;
         }
         
         isMoving = true;
         
-        FruitSwap(index, aboveIndex).OnComplete(()=>
+        FruitSwap(index, aboveIndex).OnComplete(() =>
         {
-            ApplyGravityOnColumn(aboveIndex);
+            ApplyGravity(aboveIndex,callback); 
         });
     }
-        
+    
+    void MatchAllTiles()
+    {
+        matchChecker.CheckAllTiles(ref fruitQueue);
+        FruitMatch();
+    }
+    
 }

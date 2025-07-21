@@ -23,7 +23,7 @@ public class Fruit : MonoBehaviour
         fruitData = data;
         
         Tween tween = null;
-
+        
         if (data.fruitType == FruitType.None)
         {
             Sequence sequence = DOTween.Sequence();
