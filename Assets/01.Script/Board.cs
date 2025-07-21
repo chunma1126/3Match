@@ -26,34 +26,42 @@ public class Board : MonoBehaviour
     private const float SWAP_DURATION = 0.23f;
     
     private bool isMoving = false;
-    private Vector2 mousePos;
-    
     private int currentFruitIndex = -1;
     private int lastFruitIndex = -1;
+        
+    private Vector2 mousePos;
     
-    private UniqueQueue<int> fruitQueue = new UniqueQueue<int>(10);
     private MatchChecker matchChecker;
+    private UniqueQueue<int> fruitQueue;
     
     private void Awake()
     {
         fruitController = GetComponent<FruitController>();
+        
+        CreateTiles();
+        matchChecker = new MatchChecker(boardSize,tiles);
+        fruitQueue = new UniqueQueue<int>(10);
+        fruitController.CreateFruit(tiles);
     }
     
     private void Start()
     {
-        CreateTiles();
-        
-        fruitController.CreateFruit(tiles);
-        matchChecker = new MatchChecker(boardSize,tiles);
-
-        MatchAllTiles();
-        
-        
+        CheckMatchAllTiles();
     }
     
     private void Update()
     {
         SwapProcess();
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            foreach (var item in tiles)
+            {
+                Destroy(item.transform.GetChild(0).gameObject);
+            }
+            fruitController.CreateFruit(tiles);
+        }
+                
     }
     
     private void CreateTiles()
@@ -147,7 +155,7 @@ public class Board : MonoBehaviour
 
     private void FruitMatch()
     {
-        if(fruitQueue == null || fruitQueue.Count <= 0)return;
+        if(fruitQueue.Count <= 0)return;
         
         // Swap must start from the minimum index
         fruitQueue = new UniqueQueue<int>(fruitQueue.OrderBy(i => i));
@@ -162,21 +170,23 @@ public class Board : MonoBehaviour
         
         int lastIndex = fruitQueue.Dequeue();
         fruitQueue.Enqueue(lastIndex); 
-                
+        
         RemoveFruitAt(lastIndex).OnComplete(() =>
         {
             int total = fruitQueue.Count;
             int completed = 0;
-            
-            foreach (int index in fruitQueue)
+
+            var queue = new Queue<int>(fruitQueue);
+            fruitQueue.Clear(); 
+                        
+            foreach (int index in queue)
             {
-                ApplyGravity(index, () =>
+                ApplyGravity(index, ()=>
                 {
                     completed = GravityComplete(completed, total);
-                });
+                });    
             }
             
-            fruitQueue.Clear(); 
         });
         
     }
@@ -187,7 +197,7 @@ public class Board : MonoBehaviour
         if (completed >= total)
         {
             completed = 0;
-            MatchAllTiles();
+            CheckMatchAllTiles();
             ResetFruitIndex();
         }
         
@@ -220,7 +230,7 @@ public class Board : MonoBehaviour
         currentFruitIndex = -1;
         lastFruitIndex = -1;
     }
-        
+            
     private Tween RemoveFruitAt(int index)
     {
         FruitData fruitData = new FruitData();
@@ -233,13 +243,12 @@ public class Board : MonoBehaviour
     {
         int aboveIndex = index - GetBoardWidthSize;
         
-        if (index < 0 || aboveIndex < 0)
+        if (aboveIndex < 0)
         {
             callback?.Invoke();
-            
             return;
         }
-        
+                
         isMoving = true;
         
         FruitSwap(index, aboveIndex).OnComplete(() =>
@@ -248,7 +257,7 @@ public class Board : MonoBehaviour
         });
     }
     
-    void MatchAllTiles()
+    private void CheckMatchAllTiles()
     {
         matchChecker.CheckAllTiles(ref fruitQueue);
         FruitMatch();

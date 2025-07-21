@@ -18,9 +18,9 @@ public class MatchChecker
             for (int x = 0; x < boardSize.x; x++)
             {
                 int index = y * boardSize.x + x;
-                
                 CheckHorizontal(index, ref queue);
                 CheckVertical(index, ref queue);
+                
             }
         }
         
@@ -39,6 +39,8 @@ public class MatchChecker
     
     private bool CheckHorizontal(int index , ref UniqueQueue<int> queue)
     {
+        if (tiles[index].CurrentFruit.fruitData.fruitType == FruitType.None) return false;
+        
         int width = boardSize.x; 
         int x = index % width;
         
@@ -77,6 +79,8 @@ public class MatchChecker
 
     private bool CheckVertical(int index, ref UniqueQueue<int> queue)
     {
+        if (tiles[index].CurrentFruit.fruitData.fruitType == FruitType.None) return false;
+
         //up
         {
             int currentY = index;
