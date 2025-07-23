@@ -8,40 +8,45 @@ public class Board : MonoBehaviour
     [SerializeField] private Vector2 startPos = new Vector2(-2,2);
     [SerializeField] private Vector2Int boardSize;
     
-    [Header("Prefab info")]
-    [SerializeField] private Tile[] tilePrefabs;
+    [Header("Hint info")]
+    [SerializeField] private float hintShowTime = 5.0f;
+    private bool isShowHint = false;
+    private float lastMatchTime = 0;
     
+    [Header("Sound info")] 
+    [SerializeField] AudioClipSO clickSound;
+    [SerializeField] AudioClipSO matchSound;
+        
     public int GetBoardWidthSize => boardSize.x;
     public int GetBoardHeightSize => boardSize.y;
     
     private ItemController itemController;
-    private Tile[] tiles;
-    private Vector2[] tilePositions;
-    
-    private const int TILE_SIZE_WIDTH = 1;
-    private const int TILE_SIZE_HEIGHT = 1;
-    
-    private const float SWAP_DURATION = 0.23f;
-    
+    private TileController tileController;
+      
     private bool isMoving = false;
-    private int currentFruitIndex = -1;
-    private int lastFruitIndex = -1;
+    private int selectFirstIndex = -1;
+    private int selectSecondIndex = -1;
         
-    private Vector2 mousePos;
-    
     private MatchChecker matchChecker;
     private UniqueQueue<int> itemQueue;
-    
+    private UniqueQueue<int> hintQueue;
+      
+    private const float SWAP_DURATION = 0.23f;
+        
     private void Awake()
     {
         itemController = GetComponent<ItemController>();
+        tileController = GetComponent<TileController>();
         
-        CreateTiles();
-        matchChecker = new MatchChecker(boardSize,tiles);
+        tileController.Init(boardSize);
+        tileController.CreateTiles(startPos);
+        
+        itemController.Init(tileController.Tiles);
+        matchChecker = new MatchChecker(boardSize,tileController.Tiles);
+                
+        hintQueue = new UniqueQueue<int>(10);
         itemQueue = new UniqueQueue<int>(10);
-        
-        itemController.Init(tiles);
-        
+        lastMatchTime = hintShowTime;
     }
     
     private void Start()
@@ -52,76 +57,40 @@ public class Board : MonoBehaviour
     
     private void Update()
     {
+        if (!isShowHint && Time.time - lastMatchTime >= hintShowTime)
+        {
+            ShowHint();
+        }
+        else if(isShowHint && Time.time - lastMatchTime < hintShowTime)
+        {
+            HideHint();
+        }
+        
         SwapProcess();
-        
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            itemController.RefillItem();
-            CheckAllTiles();
-        }
-        
     }
-    
-    private void CreateTiles()
-    {
-        tiles = new Tile[boardSize.x * boardSize.y];
-        tilePositions = new Vector2[boardSize.x * boardSize.y];
         
-        for (int x = 0; x < GetBoardWidthSize; x++)
-        {
-            for (int y = 0; y < GetBoardHeightSize; y++)
-            {
-                Vector2 pos = startPos + new Vector2(x * TILE_SIZE_WIDTH, -y * TILE_SIZE_HEIGHT);
-                Tile tile = Instantiate(tilePrefabs[(y + x) % 2], pos, Quaternion.identity);
-                tile.transform.SetParent(transform);
-                
-                tile.gameObject.name = $"Tile_{x}_{y}";
-                
-                tiles[GetIndex(x,y)] = tile;
-                tilePositions[GetIndex(x,y)] = tile.transform.position;
-            }
-        }
-        int GetIndex(int x, int y)
-        {
-            return y * boardSize.x + x;
-        }
-    }
-    
-    private Tile FindTile()
-    {
-        return tiles
-            .OrderBy(tile => Vector2.Distance(mousePos, tile.transform.position))
-            .FirstOrDefault()
-            ?.GetComponentInChildren<Tile>();
-    }
-    
     private void SwapProcess()
     {
         if(isMoving)return;
         
         if (Input.GetMouseButtonDown(0))
         {
-            mousePos = Utility.GetMouseWorldPosition();
-            Tile currentTile = FindTile();
+            Tile currentTile = tileController.FindTile(Utility.GetMouseWorldPosition());
 
-            currentFruitIndex = Array.IndexOf(tilePositions, currentTile.transform.position);
+            selectFirstIndex = Array.IndexOf(tileController.TilesPositions, currentTile.transform.position);
         }
         
         if (Input.GetMouseButtonUp(0))
         {
-            mousePos = Utility.GetMouseWorldPosition();
-            Tile lastTile = FindTile();
-            
-            lastFruitIndex = Array.IndexOf(tilePositions, lastTile.transform.position);
+            Tile lastTile = tileController.FindTile(Utility.GetMouseWorldPosition());
+                    
+            selectSecondIndex = Array.IndexOf(tileController.TilesPositions, lastTile.transform.position);
         }
         
-        bool isAdjacentHorizontally = Mathf.Abs(currentFruitIndex - lastFruitIndex) == 1;
-        bool isAdjacentVertically = Mathf.Abs(currentFruitIndex - lastFruitIndex) == GetBoardWidthSize;
-        bool isTileHashFruit = currentFruitIndex != -1 && lastFruitIndex != -1 &&
-                               tiles[currentFruitIndex].CurrentItem.colorData.colorType != ColorType.None &&
-                               tiles[lastFruitIndex].CurrentItem.colorData.colorType != ColorType.None;
+        bool isAdjustment = tileController.IsAdjacent(selectFirstIndex , selectSecondIndex);
+        bool isTileHashFruit = tileController.HasVailedItem(selectFirstIndex , selectSecondIndex);
         
-        bool canSwap = isTileHashFruit && (isAdjacentHorizontally || isAdjacentVertically);
+        bool canSwap = (isTileHashFruit && isAdjustment);
         if (canSwap)
         {
             TrySwap();
@@ -131,15 +100,15 @@ public class Board : MonoBehaviour
         
     private void TrySwap()
     {
-        if (currentFruitIndex == -1 || lastFruitIndex == -1)
+        if (selectFirstIndex == -1 || selectSecondIndex == -1)
         {
             ResetIndex();
             return;
         }
         
-        Swap(currentFruitIndex, lastFruitIndex).OnComplete(() =>
+        Swap(selectFirstIndex, selectSecondIndex).OnComplete(() =>
         {
-            if (matchChecker.IsMatch(currentFruitIndex,lastFruitIndex,ref itemQueue))
+            if (matchChecker.IsMatch(selectFirstIndex,selectSecondIndex,ref itemQueue))
             {
                 //match
                 Match();
@@ -147,7 +116,7 @@ public class Board : MonoBehaviour
             else
             {
                 //swap undo
-                Swap(currentFruitIndex, lastFruitIndex).OnComplete(ResetIndex);
+                Swap(selectFirstIndex, selectSecondIndex).OnComplete(ResetIndex);
             }
         });
         
@@ -157,21 +126,24 @@ public class Board : MonoBehaviour
     {
         if(itemQueue.Count <= 0)return;
         
+        AudioManager.Instance.PlaySound(matchSound);
+        lastMatchTime = Time.time;
+                
         // Swap must start from the minimum index
         itemQueue = new UniqueQueue<int>(itemQueue.OrderBy(i => i));
         
         int size = itemQueue.Count - 1;
         for (int i = 0; i <size; i++)
         {
-            int fruitIndex = itemQueue.Dequeue();
-            RemoveAt(fruitIndex);
-            itemQueue.Enqueue(fruitIndex); 
+            int index = itemQueue.Dequeue();
+            tileController.RemoveItem(index);
+            itemQueue.Enqueue(index); 
         }
         
         int lastIndex = itemQueue.Dequeue();
         itemQueue.Enqueue(lastIndex); 
         
-        RemoveAt(lastIndex).OnComplete(() =>
+        tileController.RemoveItem(lastIndex).OnComplete(() =>
         {
             int total = itemQueue.Count;
             int completed = 0;
@@ -209,8 +181,8 @@ public class Board : MonoBehaviour
     {
         isMoving = true;
         
-        Tile tileA = tiles[currentIndex];
-        Tile tileB = tiles[lastIndex];
+        Tile tileA = tileController.Tiles[currentIndex];
+        Tile tileB = tileController.Tiles[lastIndex];
         
         Item itemA = tileA.CurrentItem;
         Item itemB = tileB.CurrentItem;
@@ -228,18 +200,10 @@ public class Board : MonoBehaviour
     private void ResetIndex()
     {
         isMoving = false;
-        currentFruitIndex = -1;
-        lastFruitIndex = -1;
+        selectFirstIndex = -1;
+        selectSecondIndex = -1;
     }
-            
-    private Tween RemoveAt(int index)
-    {
-        ColorData colorData = new ColorData();
-        colorData.colorType = ColorType.None;
         
-        return tiles[index].CurrentItem.SetData(colorData);
-    }
-    
     private void ApplyGravity(int index,Action callback = null)
     {
         int aboveIndex = index - GetBoardWidthSize;
@@ -263,5 +227,32 @@ public class Board : MonoBehaviour
         matchChecker.CheckAllTiles(ref itemQueue);
         Match();
     }
+
+    private void ShowHint()
+    {
+        isShowHint = true;
+        
+        hintQueue = matchChecker.FindHint();
+        foreach (var item in hintQueue)
+        {
+            Tile tile = tileController.Tiles[item];
+            tile.CurrentItem.GetSpriteRenderer().DOFade(0.7f , 0.2f).SetLink(tile.CurrentItem.gameObject);
+        }
+        
+    }
+
+    private void HideHint()
+    {
+        isShowHint = false;
+        
+        foreach (var item in hintQueue)
+        {
+            Tile tile = tileController.Tiles[item];
+            tile.CurrentItem.GetSpriteRenderer().DOFade(1, 0.2f).SetLink(tile.CurrentItem.gameObject);
+        }
+        hintQueue.Clear();
+    }
+    
+    
     
 }

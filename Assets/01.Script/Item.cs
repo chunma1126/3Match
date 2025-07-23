@@ -41,14 +41,17 @@ public class Item : MonoBehaviour
             Sequence sequence = DOTween.Sequence();
             sequence.Append(transform.DOScale(originalScale , scaleDuration));
             spriteRenderer.sprite = colorData.sprite;
-            spriteRenderer.color = colorData.Color;
+            
+            var color = colorData.Color;
+            spriteRenderer.color = new Color(color.r ,color.g ,color.b  ,1);
             
             tween = sequence;
         }
         
         gameObject.name = colorData.colorType.ToString();
         return tween;
-        
     }
+       
+    public SpriteRenderer GetSpriteRenderer() => spriteRenderer;
     
 }

@@ -10,6 +10,5 @@ public static class Utility
         Vector3 mousePos = Input.mousePosition;
         return Camera.main.ScreenToWorldPoint(mousePos);
     }
-    
-    
+        
 }
