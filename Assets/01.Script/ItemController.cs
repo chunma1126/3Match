@@ -34,9 +34,10 @@ public class ItemController : MonoBehaviour
             {
                 continue;   
             }
-                    
+                
             currentTile.CurrentItem.SetData(colorDatas.fruitData[Random.Range(0 , colorDatas.fruitData.Length)]);
         }
+        
     } 
             
 }

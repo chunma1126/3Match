@@ -38,9 +38,12 @@ public class Item : MonoBehaviour
         }
         else
         {
-            transform.localScale = originalScale;
+            Sequence sequence = DOTween.Sequence();
+            sequence.Append(transform.DOScale(originalScale , scaleDuration));
             spriteRenderer.sprite = colorData.sprite;
             spriteRenderer.color = colorData.Color;
+            
+            tween = sequence;
         }
         
         gameObject.name = colorData.colorType.ToString();

@@ -175,16 +175,18 @@ public class Board : MonoBehaviour
         {
             int total = itemQueue.Count;
             int completed = 0;
-                        
-            foreach (int index in itemQueue)
+            
+            var queue = new UniqueQueue<int>(itemQueue);
+            itemQueue.Clear(); 
+            
+            foreach (int index in queue)
             {
                 ApplyGravity(index, ()=>
                 {
                     completed = GravityComplete(completed, total);
                 });    
             }
-            itemQueue.Clear(); 
-            
+                        
         });
         
     }
@@ -195,6 +197,7 @@ public class Board : MonoBehaviour
         if (completed >= total)
         {
             completed = 0;
+            itemController.RefillItem();
             CheckAllTiles();
             ResetIndex();
         }
