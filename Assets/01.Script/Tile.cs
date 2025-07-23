@@ -2,15 +2,15 @@
 
 public class Tile : MonoBehaviour
 {
-    private Fruit currentFruit;
-    public Fruit CurrentFruit
+    private Item currentItem;
+    public Item CurrentItem
     {
-        get => currentFruit;
+        get => currentItem;
         set
         {
-            currentFruit = value;
-            if (currentFruit != null)
-                currentFruit.transform.SetParent(transform);
+            currentItem = value;
+            if (currentItem != null)
+                currentItem.transform.SetParent(transform);
             
         }
     }

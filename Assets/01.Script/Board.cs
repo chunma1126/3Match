@@ -16,7 +16,7 @@ public class Board : MonoBehaviour
     public int GetBoardWidthSize => boardSize.x;
     public int GetBoardHeightSize => boardSize.y;
     
-    private FruitController fruitController;
+    private ItemController itemController;
     private Tile[] tiles;
     private Vector2[] tilePositions;
     
@@ -36,12 +36,14 @@ public class Board : MonoBehaviour
     
     private void Awake()
     {
-        fruitController = GetComponent<FruitController>();
+        itemController = GetComponent<ItemController>();
         
         CreateTiles();
         matchChecker = new MatchChecker(boardSize,tiles);
         fruitQueue = new UniqueQueue<int>(10);
-        fruitController.CreateFruit(tiles);
+        
+        itemController.Init(tiles);
+        itemController.CreateItem();
     }
     
     private void Start()
@@ -52,16 +54,12 @@ public class Board : MonoBehaviour
     private void Update()
     {
         SwapProcess();
-
+        
         if (Input.GetKeyDown(KeyCode.R))
         {
-            foreach (var item in tiles)
-            {
-                Destroy(item.transform.GetChild(0).gameObject);
-            }
-            fruitController.CreateFruit(tiles);
+            itemController.RefillItem();
         }
-                
+        
     }
     
     private void CreateTiles()
@@ -118,8 +116,8 @@ public class Board : MonoBehaviour
         bool isAdjacentHorizontally = Mathf.Abs(currentFruitIndex - lastFruitIndex) == 1;
         bool isAdjacentVertically = Mathf.Abs(currentFruitIndex - lastFruitIndex) == GetBoardWidthSize;
         bool isTileHashFruit = currentFruitIndex != -1 && lastFruitIndex != -1 &&
-                               tiles[currentFruitIndex].CurrentFruit.fruitData.fruitType != FruitType.None &&
-                               tiles[lastFruitIndex].CurrentFruit.fruitData.fruitType != FruitType.None;
+                               tiles[currentFruitIndex].CurrentItem.colorData.colorType != ColorType.None &&
+                               tiles[lastFruitIndex].CurrentItem.colorData.colorType != ColorType.None;
         
         bool canSwap = isTileHashFruit && (isAdjacentHorizontally || isAdjacentVertically);
         if (canSwap)
@@ -150,9 +148,9 @@ public class Board : MonoBehaviour
                 FruitSwap(currentFruitIndex, lastFruitIndex).OnComplete(ResetFruitIndex);
             }
         });
-                
+        
     }
-
+    
     private void FruitMatch()
     {
         if(fruitQueue.Count <= 0)return;
@@ -175,17 +173,15 @@ public class Board : MonoBehaviour
         {
             int total = fruitQueue.Count;
             int completed = 0;
-
-            var queue = new Queue<int>(fruitQueue);
-            fruitQueue.Clear(); 
                         
-            foreach (int index in queue)
+            foreach (int index in fruitQueue)
             {
                 ApplyGravity(index, ()=>
                 {
                     completed = GravityComplete(completed, total);
                 });    
             }
+            fruitQueue.Clear(); 
             
         });
         
@@ -193,7 +189,7 @@ public class Board : MonoBehaviour
 
     private int GravityComplete(int completed, int total)
     {
-        completed++;
+        ++completed;
         if (completed >= total)
         {
             completed = 0;
@@ -211,15 +207,15 @@ public class Board : MonoBehaviour
         Tile tileA = tiles[currentIndex];
         Tile tileB = tiles[lastIndex];
         
-        Fruit fruitA = tileA.CurrentFruit;
-        Fruit fruitB = tileB.CurrentFruit;
+        Item itemA = tileA.CurrentItem;
+        Item itemB = tileB.CurrentItem;
         
-        tileA.CurrentFruit = fruitB;
-        tileB.CurrentFruit = fruitA;
+        tileA.CurrentItem = itemB;
+        tileB.CurrentItem = itemA;
         
         Sequence sequence = DOTween.Sequence();
-        sequence.Append(fruitA.transform.DOLocalMove(Vector3.zero, SWAP_DURATION));
-        sequence.Join(fruitB.transform.DOLocalMove(Vector3.zero, SWAP_DURATION));
+        sequence.Append(itemA.transform.DOLocalMove(Vector3.zero, SWAP_DURATION));
+        sequence.Join(itemB.transform.DOLocalMove(Vector3.zero, SWAP_DURATION));
         
         return sequence;
     }
@@ -233,10 +229,10 @@ public class Board : MonoBehaviour
             
     private Tween RemoveFruitAt(int index)
     {
-        FruitData fruitData = new FruitData();
-        fruitData.fruitType = FruitType.None;
+        ColorData colorData = new ColorData();
+        colorData.colorType = ColorType.None;
         
-        return tiles[index].CurrentFruit.SetData(fruitData);
+        return tiles[index].CurrentItem.SetData(colorData);
     }
     
     private void ApplyGravity(int index,Action callback = null)
