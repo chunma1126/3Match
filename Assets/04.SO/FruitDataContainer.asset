@@ -15,22 +15,22 @@ MonoBehaviour:
   fruitData:
   - colorType: 1
     Color: {r: 1, g: 0.32156864, b: 0.32156864, a: 1}
-    sprite: {fileID: 8667738423319941500, guid: ce88e1908b26ccb4f9c1dbe8a53d4d82, type: 3}
+    sprite: {fileID: 8667738423319941500, guid: 25fadaca3d7a3034d804f3b60cf61dd9, type: 3}
   - colorType: 2
     Color: {r: 1, g: 0.4745098, b: 0.24705882, a: 1}
-    sprite: {fileID: 8667738423319941500, guid: ce88e1908b26ccb4f9c1dbe8a53d4d82, type: 3}
+    sprite: {fileID: 8667738423319941500, guid: 25fadaca3d7a3034d804f3b60cf61dd9, type: 3}
   - colorType: 3
     Color: {r: 1, g: 0.85490197, b: 0.4745098, a: 1}
-    sprite: {fileID: 8667738423319941500, guid: ce88e1908b26ccb4f9c1dbe8a53d4d82, type: 3}
+    sprite: {fileID: 8667738423319941500, guid: 25fadaca3d7a3034d804f3b60cf61dd9, type: 3}
   - colorType: 4
     Color: {r: 0.2, g: 0.8509804, b: 0.69803923, a: 1}
-    sprite: {fileID: 8667738423319941500, guid: ce88e1908b26ccb4f9c1dbe8a53d4d82, type: 3}
+    sprite: {fileID: 8667738423319941500, guid: 25fadaca3d7a3034d804f3b60cf61dd9, type: 3}
   - colorType: 5
     Color: {r: 0.20392157, g: 0.6745098, b: 0.8784314, a: 1}
-    sprite: {fileID: 8667738423319941500, guid: ce88e1908b26ccb4f9c1dbe8a53d4d82, type: 3}
+    sprite: {fileID: 8667738423319941500, guid: 25fadaca3d7a3034d804f3b60cf61dd9, type: 3}
   - colorType: 6
     Color: {r: 0.2509804, g: 0.2509804, b: 0.47843137, a: 1}
-    sprite: {fileID: 8667738423319941500, guid: ce88e1908b26ccb4f9c1dbe8a53d4d82, type: 3}
+    sprite: {fileID: 8667738423319941500, guid: 25fadaca3d7a3034d804f3b60cf61dd9, type: 3}
   - colorType: 7
     Color: {r: 0.4392157, g: 0.43529412, b: 0.827451, a: 1}
-    sprite: {fileID: 8667738423319941500, guid: ce88e1908b26ccb4f9c1dbe8a53d4d82, type: 3}
+    sprite: {fileID: 8667738423319941500, guid: 25fadaca3d7a3034d804f3b60cf61dd9, type: 3}

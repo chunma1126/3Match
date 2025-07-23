@@ -20,6 +20,9 @@ public class ItemController : MonoBehaviour
             
             Item currentItem = Instantiate(item, spawnPos, Quaternion.identity);
             currentItem.SetData(colorDatas.fruitData[Random.Range(0 , colorDatas.fruitData.Length)]);
+            //currentItem.transform.SetParent(currentTile.transform);
+            
+            currentTile.CurrentItem = currentItem;
         }
     }
     

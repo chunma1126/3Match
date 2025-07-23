@@ -4,6 +4,8 @@ public class MatchChecker
 {
     private readonly Tile[] tiles;
     private readonly Vector2Int boardSize;
+
+    private const int MATCH_MIN_SIZE = 3;
     
     public MatchChecker(Vector2Int boardSize,Tile[] tiles)
     {
@@ -50,8 +52,7 @@ public class MatchChecker
             int i1 = index - 2;
             int i2 = index - 1;
             int i3 = index;
-            if (IsTripleMatch(i1, i2, i3, ref queue))
-                return true;
+            IsTripleMatch(i1, i2, i3, ref queue);
         }
 
         // center (x-1, x, x+1)
@@ -60,8 +61,7 @@ public class MatchChecker
             int i1 = index - 1;
             int i2 = index;
             int i3 = index + 1;
-            if (IsTripleMatch(i1, i2, i3, ref queue))
-                return true;
+            IsTripleMatch(i1, i2, i3, ref queue);
         }
 
         // right (x, x+1, x+2)
@@ -70,13 +70,12 @@ public class MatchChecker
             int i1 = index;
             int i2 = index + 1;
             int i3 = index + 2;
-            if (IsTripleMatch(i1, i2, i3, ref queue))
-                return true;
+            IsTripleMatch(i1, i2, i3, ref queue);
         }
-        
-        return false;
-    }
 
+        return queue.Count >= MATCH_MIN_SIZE;
+    }
+    
     private bool CheckVertical(int index, ref UniqueQueue<int> queue)
     {
         if (tiles[index].CurrentItem.colorData.colorType == ColorType.None) return false;
@@ -86,11 +85,9 @@ public class MatchChecker
             int currentY = index;
             int up1 = currentY - boardSize.x;
             int up2 = currentY -  boardSize.x  * 2;
-            
-            if (IsTripleMatch(currentY , up1 ,up2,ref queue))
-            {
-                return true;
-            }
+
+
+            IsTripleMatch(currentY, up1, up2, ref queue);
         }
         
         //center
@@ -99,10 +96,7 @@ public class MatchChecker
             int up = currentX - boardSize.x;
             int down = currentX +  boardSize.x;
             
-            if (IsTripleMatch(currentX , up ,down,ref queue))
-            {
-                return true;
-            }
+            IsTripleMatch(currentX, up, down, ref queue);
         }
         
         //Right
@@ -110,13 +104,10 @@ public class MatchChecker
             int currentX = index;
             int down = currentX +  boardSize.x;
             int down2 = currentX +  boardSize.x * 2;
-            
-            if (IsTripleMatch(currentX , down ,down2,ref queue))
-            {
-                return true;
-            }
+
+            IsTripleMatch(currentX, down, down2, ref queue);
         }
-        return false;
+        return queue.Count >= MATCH_MIN_SIZE;
     }
     
     private bool IsTripleMatch(int a, int b, int c, ref UniqueQueue<int> queue)
