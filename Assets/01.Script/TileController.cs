@@ -82,7 +82,7 @@ public class TileController : MonoBehaviour
         
     private Vector2Int IndexToPosition(int index)
     {
-        return new Vector2Int(index % boardSize.x, index / boardSize.y);
+        return new Vector2Int(index % boardSize.x, index / boardSize.x);
     }
     
     

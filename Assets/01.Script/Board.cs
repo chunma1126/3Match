@@ -126,9 +126,10 @@ public class Board : MonoBehaviour
     {
         if(itemQueue.Count <= 0)return;
         
+        UIManager.Instance.AddScore(400);
         AudioManager.Instance.PlaySound(matchSound);
         lastMatchTime = Time.time;
-                
+        
         // Swap must start from the minimum index
         itemQueue = new UniqueQueue<int>(itemQueue.OrderBy(i => i));
         
