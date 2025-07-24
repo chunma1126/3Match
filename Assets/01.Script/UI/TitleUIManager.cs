@@ -1,7 +1,5 @@
-using System;
-using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
+using TMPro;
 
 public class TitleUIManager : MonoSingleton<TitleUIManager>
 {   
