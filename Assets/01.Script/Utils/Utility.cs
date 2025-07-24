@@ -11,4 +11,11 @@ public static class Utility
         return Camera.main.ScreenToWorldPoint(mousePos);
     }
     
+    public static Vector3 GetTouchWorldPosition(Vector2 screenPosition)
+    {
+        Vector3 worldPos = Camera.main.ScreenToWorldPoint(screenPosition);
+        worldPos.z = 0f; // 2D 게임이라면 Z값 고정
+        return worldPos;
+    }
+    
 }

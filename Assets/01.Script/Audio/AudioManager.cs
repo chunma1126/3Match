@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[DontDestroyOnLoad]
 public class AudioManager : MonoSingleton<AudioManager>
 {
     public void PlaySound(IAudioClip clip)

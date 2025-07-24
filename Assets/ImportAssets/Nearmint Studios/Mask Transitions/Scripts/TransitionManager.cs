@@ -133,7 +133,7 @@ namespace MaskTransitions
         {
             StartCoroutine(LoadLevelWithWait(sceneName, delay));
         }
-
+        
         IEnumerator LoadLevelWithWait(string sceneName, float delay)
         {
             yield return new WaitForSeconds(delay);

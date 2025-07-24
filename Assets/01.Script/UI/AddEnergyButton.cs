@@ -109,7 +109,7 @@ public class AddEnergyButton : MonoBehaviour
             {
                 Debug.Log($"보상 획득: {reward.Type}, {reward.Amount}");
                 AddEnergy();
-                TitleUIManager.Instance.ActiveAddPopUp(false);
+                TitleUIManager.Instance.PopUp(PopupType.Add);
             });
         }
         else

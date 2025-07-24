@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Linq;
 using DG.Tweening;
 using System;
+using MaskTransitions;
 
 public class Board : MonoBehaviour
 {
@@ -32,7 +33,9 @@ public class Board : MonoBehaviour
     private UniqueQueue<int> hintQueue;
       
     private const float SWAP_DURATION = 0.23f;
-        
+
+    private const string TITLE_SCENE = "0.TitleScene";
+    
     private void Awake()
     {
         itemController = GetComponent<ItemController>();
@@ -73,6 +76,7 @@ public class Board : MonoBehaviour
     {
         if(isMoving)return;
         
+#if UNITY_EDITOR || UNITY_STANDALONE
         if (Input.GetMouseButtonDown(0))
         {
             Tile currentTile = tileController.FindTile(Utility.GetMouseWorldPosition());
@@ -86,7 +90,25 @@ public class Board : MonoBehaviour
                     
             selectSecondIndex = Array.IndexOf(tileController.TilesPositions, lastTile.transform.position);
         }
-        
+#elif UNITY_ANDROID
+if (Input.touchCount > 0)
+        {
+            Touch touch = Input.GetTouch(0);
+
+            if (touch.phase == TouchPhase.Began)
+            {
+                Tile currentTile = tileController.FindTile(Utility.GetTouchWorldPosition(touch.position));
+                selectFirstIndex = Array.IndexOf(tileController.TilesPositions, currentTile.transform.position);
+            }
+            
+            if (touch.phase == TouchPhase.Ended)
+            {
+                Tile lastTile = tileController.FindTile(Utility.GetTouchWorldPosition(touch.position));
+                selectSecondIndex = Array.IndexOf(tileController.TilesPositions, lastTile.transform.position);
+            }
+        }
+#endif
+                
         bool isAdjustment = tileController.IsAdjacent(selectFirstIndex , selectSecondIndex);
         bool isTileHashFruit = tileController.HasVailedItem(selectFirstIndex , selectSecondIndex);
         
@@ -173,6 +195,12 @@ public class Board : MonoBehaviour
             itemController.RefillItem();
             CheckAllTiles();
             ResetIndex();
+
+            if (matchChecker.FindHint().Count <= 0)
+            {
+                TransitionManager.Instance.LoadLevel(TITLE_SCENE);
+            }
+            
         }
         
         return completed;

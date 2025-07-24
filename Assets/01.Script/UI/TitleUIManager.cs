@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
@@ -7,14 +8,21 @@ public class TitleUIManager : MonoSingleton<TitleUIManager>
     private Counter energyCounter;
     private const int MAX_ENERGY_COUNT = 10;
     
-    [SerializeField] public AddPopup addPopUp;
+    [SerializeField] public BasePopup addPopup;
+    [SerializeField] public BasePopup settingsPopup;
+    
+    private Dictionary<PopupType, BasePopup> popups = new Dictionary<PopupType, BasePopup>();
     
     protected override void Awake()
     {
         base.Awake();
         energyCounter = new Counter();
         energyCounter.OnChangeValue += ChangeEnergyText;
-       
+        
+        popups.Add(PopupType.Add , addPopup);
+        popups.Add(PopupType.Setting , settingsPopup);
+        
+        Application.targetFrameRate = 60;
     }
 
     private void Start()
@@ -31,7 +39,7 @@ public class TitleUIManager : MonoSingleton<TitleUIManager>
     {
         if (energyCounter.Value <= 0 && energy <= 0)
         {
-            ActiveAddPopUp(true);
+            PopUp(PopupType.Add);
             return;
         }
         
@@ -44,16 +52,15 @@ public class TitleUIManager : MonoSingleton<TitleUIManager>
         energyText.SetText(text);
     }
 
-    public void ActiveAddPopUp(bool active)
+    public void PopUp(PopupType type)
     {
-        if (active)
-        {
-            addPopUp.PopUp();
-        }
-        else
-        {
-            addPopUp.PopDown();
-        }
+        popups[type].PopUp();
     }
+    
+    public void PopDown(PopupType type)
+    {
+        popups[type].PopDown();
+    }
+    
     
 }

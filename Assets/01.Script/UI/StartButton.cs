@@ -1,4 +1,4 @@
-using UnityEngine.SceneManagement;
+using MaskTransitions;
 
 public class StartButton : Button
 {
@@ -6,7 +6,7 @@ public class StartButton : Button
     protected override void Click()
     {
         TitleUIManager.Instance.AddEnergy(-1);
-        SceneManager.LoadScene(GAME_SCENE);
+        TransitionManager.Instance.LoadLevel(GAME_SCENE);
     }
-    
+        
 }
