@@ -148,7 +148,7 @@ if (Input.touchCount > 0)
     {
         if(itemQueue.Count <= 0)return;
         
-        UIManager.Instance.AddScore(400);
+        UIManager.Instance.AddScore(50);
         AudioManager.Instance.PlaySound(matchSound);
         lastMatchTime = Time.time;
         

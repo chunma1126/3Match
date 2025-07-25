@@ -1,7 +1,6 @@
 using System.Collections;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
+using TMPro;
 
 public class UIManager : MonoSingleton<UIManager>
 {
@@ -11,13 +10,11 @@ public class UIManager : MonoSingleton<UIManager>
     private float score;
     private WaitForSeconds scoreWait;
         
-    private Dictionary<PopupType, BasePopup> popups = new Dictionary<PopupType, BasePopup>();
-    
     protected override void Awake()
     {
         base.Awake();
         scoreCounter  = new Counter();
-        scoreWait = new WaitForSeconds(0.0001f);
+        scoreWait = new WaitForSeconds(0.001f);
         
         scoreCounter.OnChangeValue += ChangeScoreText;
     }
@@ -45,16 +42,5 @@ public class UIManager : MonoSingleton<UIManager>
             yield return scoreWait;
         }
     }
-    
-    public void PopUp(PopupType type)
-    {
-        popups[type].PopUp();
-    }
-    
-    public void PopDown(PopupType type)
-    {
-        popups[type].PopDown();
-    }
-
-    
+        
 }

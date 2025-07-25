@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: MatchSound
   m_EditorClassIdentifier: 
   audioClip: {fileID: 8300000, guid: 0f7ba89c42924f54cb097142d0261433, type: 3}
-  mixer: {fileID: 24100000, guid: a1102fc0f365ae74cb74798e163f17d1, type: 2}
+  mixer: {fileID: 6097284871030977804, guid: a1102fc0f365ae74cb74798e163f17d1, type: 2}
   loop: 0
-  volume: 0.476
+  volume: 0.529

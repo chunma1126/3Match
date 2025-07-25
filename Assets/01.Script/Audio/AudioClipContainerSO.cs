@@ -1,24 +1,30 @@
 using UnityEngine;
+using UnityEngine.Audio;
 
 [CreateAssetMenu(fileName = "AudioSO", menuName = "SO/Audio/Container")]
-public class AudioClipContainerSO : ScriptableObject,IAudioClip
+public class AudioClipContainerSO : AudioSO
 {
     public AudioClipSO[] audioClips;
     private AudioClipSO currentClip;
     
-    public AudioClip GetAudioClip()
+    public override AudioClip GetAudioClip()
     {
         currentClip = audioClips[Random.Range(0 , audioClips.Length)];
         return currentClip.GetAudioClip();
     }
     
-    public float GetVolume()
+    public override float GetVolume()
     {
         return currentClip.GetVolume();
     }
 
-    public bool GetLoop()
+    public override bool GetLoop()
     {
         return currentClip.GetLoop();
+    }
+
+    public override AudioMixerGroup GetAudioMixerGroup()
+    {
+        return currentClip.GetAudioMixerGroup();
     }
 }

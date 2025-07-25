@@ -2,26 +2,32 @@ using UnityEngine;
 using UnityEngine.Audio;
 
 [CreateAssetMenu(fileName = "AudioSO", menuName = "SO/Audio/Clip")]
-public class AudioClipSO : ScriptableObject,IAudioClip
+public class AudioClipSO : AudioSO
 {
     [SerializeField] private AudioClip audioClip;
-    [SerializeField] private AudioMixer mixer;
-
+    [SerializeField] private AudioMixerGroup mixer;
+    
     [SerializeField] private bool loop;
     [Range(0,1)] [SerializeField] private float volume;
     
-    public AudioClip GetAudioClip()
+    public override AudioClip GetAudioClip()
     {
         return audioClip;
     }
 
-    public float GetVolume()
+    public override float GetVolume()
     {
         return volume;
     }
 
-    public bool GetLoop()
+    public override bool GetLoop()
     {
         return loop;
     }
+
+    public override AudioMixerGroup GetAudioMixerGroup()
+    {
+        return mixer;
+    }
+    
 }
