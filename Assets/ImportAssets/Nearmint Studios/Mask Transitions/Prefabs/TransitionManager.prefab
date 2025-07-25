@@ -315,7 +315,7 @@ MonoBehaviour:
   transitionImage: {fileID: 8177471321811730583, guid: 87aaca0a643d54397ba969dab4fc8875, type: 3}
   transitionColor: {r: 0.6627451, g: 0.64705884, b: 0.6039216, a: 1}
   rotation: 0
-  transitionTime: 1.2
+  transitionTime: 1.63
   parentMaskRect: {fileID: 1224733614992737017}
   maskRect: {fileID: 5572791951585757581}
   transitionCanvas: {fileID: 4165769277727045733}

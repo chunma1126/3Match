@@ -5,6 +5,7 @@ using UnityEngine.Serialization;
 
 public enum PopupType
 {
+    None,
     Setting,
     Add,    
     End,

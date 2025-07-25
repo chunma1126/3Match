@@ -196,7 +196,8 @@ if (Input.touchCount > 0)
             CheckAllTiles();
             ResetIndex();
 
-            if (matchChecker.FindHint().Count <= 0)
+            bool hasNoMatch = matchChecker.FindHint().Count <= 0;
+            if (hasNoMatch)
             {
                 TransitionManager.Instance.LoadLevel(TITLE_SCENE);
             }
@@ -220,6 +221,7 @@ if (Input.touchCount > 0)
         tileB.CurrentItem = itemA;
         
         Sequence sequence = DOTween.Sequence();
+        sequence.SetAutoKill(true);
         sequence.Append(itemA.transform.DOLocalMove(Vector3.zero, SWAP_DURATION));
         sequence.Join(itemB.transform.DOLocalMove(Vector3.zero, SWAP_DURATION));
         
@@ -265,6 +267,7 @@ if (Input.touchCount > 0)
         foreach (var item in hintQueue)
         {
             Tile tile = tileController.Tiles[item];
+            tile.CurrentItem.GetSpriteRenderer().DOKill();
             tile.CurrentItem.GetSpriteRenderer().DOFade(0.7f , 0.2f).SetLink(tile.CurrentItem.gameObject);
         }
         
@@ -277,6 +280,7 @@ if (Input.touchCount > 0)
         foreach (var item in hintQueue)
         {
             Tile tile = tileController.Tiles[item];
+            tile.CurrentItem.GetSpriteRenderer().DOKill();
             tile.CurrentItem.GetSpriteRenderer().DOFade(1, 0.2f).SetLink(tile.CurrentItem.gameObject);
         }
         hintQueue.Clear();
