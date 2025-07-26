@@ -1,3 +1,4 @@
+using DG.Tweening;
 using UnityEngine;
 
 public class ItemController : MonoBehaviour
@@ -19,9 +20,8 @@ public class ItemController : MonoBehaviour
             Vector2 spawnPos = currentTile.transform.position;
             
             Item currentItem = Instantiate(item, spawnPos, Quaternion.identity);
-            currentItem.SetData(colorDatas.fruitData[Random.Range(0 , colorDatas.fruitData.Length)]);
-            //currentItem.transform.SetParent(currentTile.transform);
-            
+            SetRandomItem(currentItem);
+                        
             currentTile.CurrentItem = currentItem;
         }
     }
@@ -34,10 +34,39 @@ public class ItemController : MonoBehaviour
             {
                 continue;   
             }
-                
-            currentTile.CurrentItem.SetData(colorDatas.fruitData[Random.Range(0 , colorDatas.fruitData.Length)]);
+
+            SetRandomItem(currentTile.CurrentItem);
         }
+    }
+
+    public void ReRollItem()
+    {
+        var data = new ColorData
+        {
+            colorType = ColorType.None
+        };
         
-    } 
-            
+        for (var index = 0; index < tiles.Length - 1; index++)
+        {
+            var item = tiles[index];
+           
+            item.CurrentItem.SetData(data);
+        }
+
+        tiles[^1].CurrentItem.SetData(data).OnComplete(() =>
+        {
+            foreach (var item in tiles)
+            {
+                SetRandomItem(item.CurrentItem);
+            }
+        });
+
+        
+    }
+
+    private void SetRandomItem(Item item)
+    {
+        item.SetData(colorDatas.fruitData[Random.Range(0 , colorDatas.fruitData.Length)]);
+    }
+    
 }

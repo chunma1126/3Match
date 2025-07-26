@@ -120,7 +120,7 @@ public class AddEnergyButton : MonoBehaviour
 
     private void AddEnergy()
     {
-        GameManager.Instance.energyCounter.Add(1);
+        
     }
     
     private void OnDestroy()
@@ -131,4 +131,5 @@ public class AddEnergyButton : MonoBehaviour
             rewardedAd = null;
         }
     }
+    
 }

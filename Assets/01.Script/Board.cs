@@ -2,7 +2,6 @@ using UnityEngine;
 using System.Linq;
 using DG.Tweening;
 using System;
-using MaskTransitions;
 
 public class Board : MonoBehaviour
 {
@@ -13,10 +12,9 @@ public class Board : MonoBehaviour
     [SerializeField] private float hintShowTime = 5.0f;
     private bool isShowHint = false;
     private float lastMatchTime = 0;
-    
-    [Header("Sound info")] 
-    [SerializeField] AudioClipSO clickSound;
-    [SerializeField] AudioClipSO matchSound;
+
+    [Header("Sound info")]
+    [SerializeField] private AudioClipSO matchSound;
         
     public int GetBoardWidthSize => boardSize.x;
     public int GetBoardHeightSize => boardSize.y;
@@ -130,6 +128,7 @@ if (Input.touchCount > 0)
         
         Swap(selectFirstIndex, selectSecondIndex).OnComplete(() =>
         {
+            
             if (matchChecker.IsMatch(selectFirstIndex,selectSecondIndex,ref itemQueue))
             {
                 //match
@@ -141,7 +140,7 @@ if (Input.touchCount > 0)
                 Swap(selectFirstIndex, selectSecondIndex).OnComplete(ResetIndex);
             }
         });
-        
+                
     }
     
     private void Match()
@@ -199,7 +198,8 @@ if (Input.touchCount > 0)
             bool hasNoMatch = matchChecker.FindHint().Count <= 0;
             if (hasNoMatch)
             {
-                TransitionManager.Instance.LoadLevel(TITLE_SCENE);
+                itemController.ReRollItem();
+                CheckAllTiles();
             }
             
         }
@@ -221,9 +221,8 @@ if (Input.touchCount > 0)
         tileB.CurrentItem = itemA;
         
         Sequence sequence = DOTween.Sequence();
-        sequence.SetAutoKill(true);
-        sequence.Append(itemA.transform.DOLocalMove(Vector3.zero, SWAP_DURATION));
-        sequence.Join(itemB.transform.DOLocalMove(Vector3.zero, SWAP_DURATION));
+        sequence.Append(itemA.transform.DOLocalMove(Vector3.zero, SWAP_DURATION).SetLink(itemA.gameObject));
+        sequence.Join(itemB.transform.DOLocalMove(Vector3.zero, SWAP_DURATION).SetLink(itemB.gameObject));
         
         return sequence;
     }

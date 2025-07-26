@@ -179,9 +179,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d957cecde78606e459a4907aa87b1086, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sliderName: 
-  exposedParameter: 
-  mixer: {fileID: 24100000, guid: a1102fc0f365ae74cb74798e163f17d1, type: 2}
+  sliderName: 0
+  exposedParameter: 0
+  mixer: {fileID: 24300002, guid: a1102fc0f365ae74cb74798e163f17d1, type: 2}
 --- !u!1 &3777860807599492449
 GameObject:
   m_ObjectHideFlags: 0
@@ -400,11 +400,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1310202906149014168}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -216.23126, y: 72.84797}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 125, y: 15}
   m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 0, y: 1}
 --- !u!222 &1163797871942271564
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -462,8 +462,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 50
-  m_fontSizeBase: 50
+  m_fontSize: 65
+  m_fontSizeBase: 65
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

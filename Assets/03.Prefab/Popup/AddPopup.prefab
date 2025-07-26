@@ -687,7 +687,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cc3c81e792f8974f983cb2f817391e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  popupType: 1
+  popupType: 2
   popupGroup: {fileID: 2706021144456782970}
   elementsGroup: {fileID: 547222924879426345}
   popUpFadeDuration: 0.37
