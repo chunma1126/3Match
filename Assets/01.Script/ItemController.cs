@@ -28,18 +28,18 @@ public class ItemController : MonoBehaviour
     
     public Tween RefillItem()
     {
-        for (var index = 0; index < tiles.Length - 1; index++)
+        Tween tween = null;
+        foreach (var currentTile in tiles)
         {
-            var currentTile = tiles[index];
             if (currentTile.CurrentItem.colorData.colorType != ColorType.None)
             {
                 continue;
             }
-
-            SetRandomItem(currentTile.CurrentItem);
+              
+            tween = SetRandomItem(currentTile.CurrentItem);
         }
-
-        return SetRandomItem( tiles[^1].CurrentItem);
+        
+        return tween;
     }
     
     [ContextMenu("Set Random Item")]
