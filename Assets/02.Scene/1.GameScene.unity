@@ -264,7 +264,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startPos: {x: -2, y: 2}
   boardSize: {x: 5, y: 8}
-  hintShowTime: 5
+  hintShowTime: 15
   matchSound: {fileID: 11400000, guid: 9c158d7ad0038cb4eb17374f855edf95, type: 2}
 --- !u!114 &761541458
 MonoBehaviour:

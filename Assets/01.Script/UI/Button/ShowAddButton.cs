@@ -1,11 +1,12 @@
 using UnityEngine;
 using GoogleMobileAds.Api;
-using UnityEngine.UI;
 
-public class AddEnergyButton : MonoBehaviour
+public class ShowAddButton : MonoBehaviour
 {
     private RewardedAd rewardedAd;
-
+    [SerializeField] private int minMoveCounterInterment = 20;
+    [SerializeField] private int maxMoveCounterInterment = 50;
+    
 #if UNITY_ANDROID
     private string adUnitId = "ca-app-pub-3940256099942544/5224354917"; // 테스트용
 #elif UNITY_IOS
@@ -108,7 +109,7 @@ public class AddEnergyButton : MonoBehaviour
             rewardedAd.Show((Reward reward) =>
             {
                 Debug.Log($"보상 획득: {reward.Type}, {reward.Amount}");
-                AddEnergy();
+                AddReward();
             });
         }
         else
@@ -118,11 +119,12 @@ public class AddEnergyButton : MonoBehaviour
         }
     }
 
-    private void AddEnergy()
+    private void AddReward()
     {
-        
+        float randomValue = Random.Range(minMoveCounterInterment, maxMoveCounterInterment);
+        GameManager.Instance.moveCounter.Add(randomValue);
     }
-    
+        
     private void OnDestroy()
     {
         if (rewardedAd != null)

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using TMPro;
@@ -6,41 +7,59 @@ public class UIManager : MonoSingleton<UIManager>
 {
     [Header("Score info")]
     [SerializeField] private TextMeshProUGUI scoreText;
-    private Counter scoreCounter;
     private float score;
+    private Coroutine scoreRoutine;
     private WaitForSeconds scoreWait;
+        
+    [Header("MoveCount info")]
+    [SerializeField] private TextMeshProUGUI moveCountText;
         
     protected override void Awake()
     {
         base.Awake();
-        scoreCounter  = new Counter();
-        scoreWait = new WaitForSeconds(0.001f);
         
-        scoreCounter.OnChangeValue += ChangeScoreText;
+        scoreWait = new WaitForSeconds(0.001f);
     }
     
-    public void AddScore(float amountValue)
+    private void Start()
     {
-        scoreCounter.Add(amountValue);
+        GameManager.Instance.scoreCounter.OnChangeValue += ChangeScoreText;
+        GameManager.Instance.moveCounter.OnChangeValue += ChangeMoveCountText;
+        
+        ChangeMoveCountText(GameManager.Instance.moveCounter.Value);
+    }
+
+    private void OnDestroy()
+    {
+        GameManager.Instance.scoreCounter.OnChangeValue -= ChangeScoreText;
+        GameManager.Instance.moveCounter.OnChangeValue -= ChangeMoveCountText;
     }
     
+    private void ChangeMoveCountText(float value)
+    {
+        moveCountText.SetText(value.ToString());
+    }
+        
     private void ChangeScoreText(float value)
     {
-        StopCoroutine(nameof(ChangeScoreRoutine));
-        StartCoroutine(nameof(ChangeScoreRoutine));
+        if (scoreRoutine != null)
+            StopCoroutine(scoreRoutine);
+        
+        scoreRoutine = StartCoroutine(ChangeScoreRoutine(value)); 
     }
     
-    private IEnumerator ChangeScoreRoutine()
-    {  
-        while (score < scoreCounter.Value)
+    private IEnumerator ChangeScoreRoutine(float value)
+    {
+        while (score < value)
         {
             score += 1f;
-            if (score > scoreCounter.Value)
-                score = scoreCounter.Value;
+            if (score > value)
+                score = value;
 
             scoreText.text = "Score: " + ((int)score).ToString("D7");
             yield return scoreWait;
         }
     }
+    
         
 }

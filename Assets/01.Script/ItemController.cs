@@ -26,19 +26,23 @@ public class ItemController : MonoBehaviour
         }
     }
     
-    public void RefillItem()
+    public Tween RefillItem()
     {
-        foreach (var currentTile in tiles)
+        for (var index = 0; index < tiles.Length - 1; index++)
         {
+            var currentTile = tiles[index];
             if (currentTile.CurrentItem.colorData.colorType != ColorType.None)
             {
-                continue;   
+                continue;
             }
 
             SetRandomItem(currentTile.CurrentItem);
         }
-    }
 
+        return SetRandomItem( tiles[^1].CurrentItem);
+    }
+    
+    [ContextMenu("Set Random Item")]
     public void ReRollItem()
     {
         var data = new ColorData
@@ -63,10 +67,11 @@ public class ItemController : MonoBehaviour
 
         
     }
-
-    private void SetRandomItem(Item item)
+        
+    private Tween SetRandomItem(Item item)
     {
-        item.SetData(colorDatas.fruitData[Random.Range(0 , colorDatas.fruitData.Length)]);
+        int randIndex = Random.Range(0, colorDatas.fruitData.Length);
+        return item.SetData(colorDatas.fruitData[randIndex]);
     }
     
 }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 [System.Serializable]
 public struct PopupInfo
@@ -9,10 +10,9 @@ public struct PopupInfo
 
 public class PopupManager : MonoSingleton<PopupManager>
 {
-    public List<PopupInfo> popupList = new List<PopupInfo>();
+    [SerializeField] private List<PopupInfo> popupList = new List<PopupInfo>();
     private Dictionary<PopupType, BasePopup> popups = new Dictionary<PopupType, BasePopup>();
-    
-    
+        
     protected override void Awake()
     {
         base.Awake();
@@ -20,7 +20,12 @@ public class PopupManager : MonoSingleton<PopupManager>
         foreach (var item in popupList)
         {
             popups.Add(item.type , item.popup);
-        }    
+        }
+
+        foreach (var item in popups)
+        {
+            PopDown(item.Key);
+        }
         
     }
 

@@ -12,7 +12,7 @@ public class Board : MonoBehaviour
     [SerializeField] private float hintShowTime = 5.0f;
     private bool isShowHint = false;
     private float lastMatchTime = 0;
-
+    
     [Header("Sound info")]
     [SerializeField] private AudioClipSO matchSound;
         
@@ -22,7 +22,7 @@ public class Board : MonoBehaviour
     private ItemController itemController;
     private TileController tileController;
       
-    private bool isMoving = false;
+    private bool canInput = true;
     private int selectFirstIndex = -1;
     private int selectSecondIndex = -1;
         
@@ -31,9 +31,7 @@ public class Board : MonoBehaviour
     private UniqueQueue<int> hintQueue;
       
     private const float SWAP_DURATION = 0.23f;
-
-    private const string TITLE_SCENE = "0.TitleScene";
-    
+        
     private void Awake()
     {
         itemController = GetComponent<ItemController>();
@@ -72,7 +70,7 @@ public class Board : MonoBehaviour
         
     private void SwapProcess()
     {
-        if(isMoving)return;
+        if(!canInput)return;
         
 #if UNITY_EDITOR || UNITY_STANDALONE
         if (Input.GetMouseButtonDown(0))
@@ -109,13 +107,13 @@ if (Input.touchCount > 0)
                 
         bool isAdjustment = tileController.IsAdjacent(selectFirstIndex , selectSecondIndex);
         bool isTileHashFruit = tileController.HasVailedItem(selectFirstIndex , selectSecondIndex);
-        
         bool canSwap = (isTileHashFruit && isAdjustment);
+        
         if (canSwap)
         {
             TrySwap();
         }
-                
+        
     }
         
     private void TrySwap()
@@ -126,12 +124,20 @@ if (Input.touchCount > 0)
             return;
         }
         
+        if (!GameManager.Instance.HasMoveCount)
+        {
+            PopupManager.Instance.PopUp(PopupType.Add);
+            ResetIndex();
+            return;
+        }
+        
         Swap(selectFirstIndex, selectSecondIndex).OnComplete(() =>
         {
             
             if (matchChecker.IsMatch(selectFirstIndex,selectSecondIndex,ref itemQueue))
             {
                 //match
+                GameManager.Instance.moveCounter.Add(-1);
                 Match();
             }
             else
@@ -140,14 +146,15 @@ if (Input.touchCount > 0)
                 Swap(selectFirstIndex, selectSecondIndex).OnComplete(ResetIndex);
             }
         });
-                
+        
     }
     
     private void Match()
     {
         if(itemQueue.Count <= 0)return;
         
-        UIManager.Instance.AddScore(50);
+        GameManager.Instance.AddScore(50);
+        
         AudioManager.Instance.PlaySound(matchSound);
         lastMatchTime = Time.time;
         
@@ -191,16 +198,16 @@ if (Input.touchCount > 0)
         if (completed >= total)
         {
             completed = 0;
-            itemController.RefillItem();
+            itemController.RefillItem().OnComplete(() =>
+            {
+                bool hasNoMatch = matchChecker.FindHint().Count <= 0;
+                if (hasNoMatch)
+                {
+                    Invoke(nameof(ReRollBoard) , 2f);
+                }
+            });
             CheckAllTiles();
             ResetIndex();
-
-            bool hasNoMatch = matchChecker.FindHint().Count <= 0;
-            if (hasNoMatch)
-            {
-                itemController.ReRollItem();
-                CheckAllTiles();
-            }
             
         }
         
@@ -209,7 +216,7 @@ if (Input.touchCount > 0)
 
     private Tween Swap(int currentIndex,int lastIndex)
     {
-        isMoving = true;
+        canInput = false;
         
         Tile tileA = tileController.Tiles[currentIndex];
         Tile tileB = tileController.Tiles[lastIndex];
@@ -229,7 +236,7 @@ if (Input.touchCount > 0)
     
     private void ResetIndex()
     {
-        isMoving = false;
+        canInput = true;
         selectFirstIndex = -1;
         selectSecondIndex = -1;
     }
@@ -244,7 +251,7 @@ if (Input.touchCount > 0)
             return;
         }
                 
-        isMoving = true;
+        canInput = false;
         
         Swap(index, aboveIndex).OnComplete(() =>
         {
@@ -257,7 +264,14 @@ if (Input.touchCount > 0)
         matchChecker.CheckAllTiles(ref itemQueue);
         Match();
     }
-
+    
+    private void ReRollBoard()
+    {
+        itemController.ReRollItem();
+        CheckAllTiles();
+    }
+    
+    #region Hint
     private void ShowHint()
     {
         isShowHint = true;
@@ -284,7 +298,6 @@ if (Input.touchCount > 0)
         }
         hintQueue.Clear();
     }
-    
-    
+    #endregion
     
 }

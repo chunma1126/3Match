@@ -31,7 +31,7 @@ public class Item : MonoBehaviour
             sequence.Append(transform.DOScale(0f, scaleDuration));
             sequence.AppendCallback(() =>
             {
-                spriteRenderer.sprite = null;
+                spriteRenderer.color = Color.clear;
             });
             
             tween = sequence;
@@ -39,7 +39,7 @@ public class Item : MonoBehaviour
         else
         {
             Sequence sequence = DOTween.Sequence();
-            sequence.Append(transform.DOScale(originalScale , scaleDuration));
+            sequence.Append(transform.DOScale(originalScale , scaleDuration).SetLink(gameObject));
             spriteRenderer.sprite = colorData.sprite;
             
             var color = colorData.Color;

@@ -1,5 +1,4 @@
-﻿
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PopupButton : Button
 {
@@ -9,5 +8,5 @@ public class PopupButton : Button
     {
         PopupManager.Instance.PopUp(popupType);
     }
-    
+            
 }
