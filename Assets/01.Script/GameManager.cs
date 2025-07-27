@@ -4,8 +4,8 @@
 public class GameManager : MonoSingleton<GameManager>
 {
     [SerializeField] private float defaultMoveCount = 5;
-    public Counter moveCounter;
     
+    public Counter moveCounter;
     public Counter scoreCounter;
         
     protected override void Awake()

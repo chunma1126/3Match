@@ -916,6 +916,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sceneName: 1.GameScene
+  bgm: {fileID: 11400000, guid: 680b18e386c093049808be99255270de, type: 2}
+  duration: 3.5
 --- !u!224 &3699423944744896988
 RectTransform:
   m_ObjectHideFlags: 0
