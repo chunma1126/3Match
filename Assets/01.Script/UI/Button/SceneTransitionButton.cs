@@ -1,10 +1,11 @@
 using MaskTransitions;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class SceneTransitionButton : Button
 {
     [SerializeField] private string sceneName;
+    
+    [Header("BGM info")]
     [SerializeField] private AudioSO bgm;
     [SerializeField] private float duration;
     
@@ -16,7 +17,7 @@ public class SceneTransitionButton : Button
         
         clicked = true;
         AudioManager.Instance.PlayBGM(bgm,duration);
-        TransitionManager.Instance.LoadLevel(sceneName);        
+        TransitionManager.Instance.LoadLevel(sceneName);
     }
-    
+        
 }

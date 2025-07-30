@@ -29,6 +29,12 @@ public class UIManager : MonoSingleton<UIManager>
         ChangeMoveCountText(GameManager.Instance.moveCounter.Value);
     }
     
+    private void OnDestroy()
+    {
+        GameManager.Instance.scoreCounter.OnChangeValue -= ChangeScoreText;
+        GameManager.Instance.moveCounter.OnChangeValue -= ChangeMoveCountText;
+    }
+    
     private void ChangeMoveCountText(float value)
     {
         moveCountText.SetText(value.ToString());
@@ -50,7 +56,7 @@ public class UIManager : MonoSingleton<UIManager>
             if (score > value)
                 score = value;
 
-            scoreText.text = "Score: " + ((int)score).ToString("D7");
+            scoreText.text = ((int)score).ToString("D7");
             yield return scoreWait;
         }
     }

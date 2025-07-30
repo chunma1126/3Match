@@ -1,6 +1,6 @@
-﻿
-using System;
+﻿using System;
 
+[System.Serializable]
 public class Counter
 {
     public event Action<float> OnChangeValue;

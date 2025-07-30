@@ -127,13 +127,13 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1260939732953143939, guid: 10816f4af4882ec4fa5cbc0d712976a7, type: 3}
-      propertyPath: bgm
-      value: 
-      objectReference: {fileID: 11400000, guid: 9ad5a85555b77ed42aa1bd7375b4abba, type: 2}
-    - target: {fileID: 1260939732953143939, guid: 10816f4af4882ec4fa5cbc0d712976a7, type: 3}
-      propertyPath: duration
-      value: 4
+    - target: {fileID: 413709762788074885, guid: 10816f4af4882ec4fa5cbc0d712976a7, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 413709762788074885, guid: 10816f4af4882ec4fa5cbc0d712976a7, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -430
       objectReference: {fileID: 0}
     - target: {fileID: 2055315814479373427, guid: 10816f4af4882ec4fa5cbc0d712976a7, type: 3}
       propertyPath: m_Pivot.x
@@ -214,6 +214,28 @@ PrefabInstance:
     - target: {fileID: 2055315814479373427, guid: 10816f4af4882ec4fa5cbc0d712976a7, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3562756034401356826, guid: 10816f4af4882ec4fa5cbc0d712976a7, type: 3}
+      propertyPath: m_text
+      value: '0000000
+
+'
+      objectReference: {fileID: 0}
+    - target: {fileID: 3562756034401356826, guid: 10816f4af4882ec4fa5cbc0d712976a7, type: 3}
+      propertyPath: m_fontSize
+      value: 132
+      objectReference: {fileID: 0}
+    - target: {fileID: 3562756034401356826, guid: 10816f4af4882ec4fa5cbc0d712976a7, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 132
+      objectReference: {fileID: 0}
+    - target: {fileID: 3562756034401356826, guid: 10816f4af4882ec4fa5cbc0d712976a7, type: 3}
+      propertyPath: m_VerticalAlignment
+      value: 512
+      objectReference: {fileID: 0}
+    - target: {fileID: 3562756034401356826, guid: 10816f4af4882ec4fa5cbc0d712976a7, type: 3}
+      propertyPath: m_HorizontalAlignment
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7400035715187681486, guid: 10816f4af4882ec4fa5cbc0d712976a7, type: 3}
       propertyPath: m_Name

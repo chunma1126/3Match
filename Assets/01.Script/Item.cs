@@ -40,7 +40,7 @@ public class Item : MonoBehaviour
         {
             Sequence sequence = DOTween.Sequence();
             sequence.Append(transform.DOScale(originalScale , scaleDuration).SetLink(gameObject));
-            spriteRenderer.sprite = colorData.sprite;
+            spriteRenderer.sprite = colorData.Sprite;
             
             var color = colorData.Color;
             spriteRenderer.color = new Color(color.r ,color.g ,color.b  ,1);

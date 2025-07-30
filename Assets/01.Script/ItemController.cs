@@ -70,8 +70,8 @@ public class ItemController : MonoBehaviour
         
     private Tween SetRandomItem(Item item)
     {
-        int randIndex = Random.Range(0, colorDatas.fruitData.Length);
-        return item.SetData(colorDatas.fruitData[randIndex]);
+        int randIndex = Random.Range(0, colorDatas.itemList.Length);
+        return item.SetData(colorDatas.itemList[randIndex]);
     }
     
 }

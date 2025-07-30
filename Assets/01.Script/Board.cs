@@ -206,6 +206,7 @@ if (Input.touchCount > 0)
                     Invoke(nameof(ReRollBoard) , 2f);
                 }
             });
+            
             CheckAllTiles();
             ResetIndex();
             
