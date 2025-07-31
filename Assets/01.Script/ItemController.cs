@@ -31,7 +31,7 @@ public class ItemController : MonoBehaviour
         Tween tween = null;
         foreach (var currentTile in tiles)
         {
-            if (currentTile.CurrentItem.colorData.colorType != ColorType.None)
+            if (currentTile.CurrentItem.colorData.ColorType != ColorType.None)
             {
                 continue;
             }
@@ -47,7 +47,7 @@ public class ItemController : MonoBehaviour
     {
         var data = new ColorData
         {
-            colorType = ColorType.None
+            ColorType = ColorType.None
         };
         
         for (var index = 0; index < tiles.Length - 1; index++)

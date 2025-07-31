@@ -103,7 +103,7 @@ public class MatchChecker
     
     private bool CheckHorizontal(int index , ref UniqueQueue<int> queue)
     {
-        if (tiles[index].CurrentItem.colorData.colorType == ColorType.None) return false;
+        if (tiles[index].CurrentItem.colorData.ColorType == ColorType.None) return false;
         
         int width = boardSize.x; 
         int x = index % width;
@@ -140,7 +140,7 @@ public class MatchChecker
     
     private bool CheckVertical(int index, ref UniqueQueue<int> queue)
     {
-        if (tiles[index].CurrentItem.colorData.colorType == ColorType.None) return false;
+        if (tiles[index].CurrentItem.colorData.ColorType == ColorType.None) return false;
         
         int width = boardSize.x;
         int height = boardSize.y;
@@ -185,9 +185,9 @@ public class MatchChecker
         if (a < 0 || b < 0 || c < 0 || a >= maxWidth || b >= maxWidth || c >= maxWidth)
             return false;
         
-        var typeA = tiles[a].CurrentItem.colorData.colorType;
-        var typeB = tiles[b].CurrentItem.colorData.colorType;
-        var typeC = tiles[c].CurrentItem.colorData.colorType;
+        var typeA = tiles[a].CurrentItem.colorData.ColorType;
+        var typeB = tiles[b].CurrentItem.colorData.ColorType;
+        var typeC = tiles[c].CurrentItem.colorData.ColorType;
         
         bool isMatch = typeA == typeB && typeA == typeC;
         

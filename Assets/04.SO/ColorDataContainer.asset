@@ -12,19 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c9eac73821053f4da553920ce340a80, type: 3}
   m_Name: ColorDataContainer
   m_EditorClassIdentifier: 
-  itemSprite: {fileID: 8667738423319941500, guid: 25fadaca3d7a3034d804f3b60cf61dd9, type: 3}
   itemList:
-  - colorType: 1
+  - ColorType: 1
     Color: {r: 1, g: 0.32156864, b: 0.32156864, a: 1}
-  - colorType: 2
+  - ColorType: 2
     Color: {r: 1, g: 0.4745098, b: 0.2509804, a: 1}
-  - colorType: 3
+  - ColorType: 3
     Color: {r: 1, g: 0.8509804, b: 0.47843137, a: 1}
-  - colorType: 4
+  - ColorType: 4
     Color: {r: 0.2, g: 0.8509804, b: 0.69803923, a: 1}
-  - colorType: 5
+  - ColorType: 5
     Color: {r: 0.20392157, g: 0.6745098, b: 0.8784314, a: 1}
-  - colorType: 6
+  - ColorType: 6
     Color: {r: 0.2509804, g: 0.2509804, b: 0.47843137, a: 1}
-  - colorType: 7
+  - ColorType: 7
     Color: {r: 0.4392157, g: 0.43529412, b: 0.85490197, a: 1}

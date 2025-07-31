@@ -68,14 +68,14 @@ public class TileController : MonoBehaviour
     public bool HasVailedItem(int selectFirstIndex , int selectSecondIndex)
     {
         return selectFirstIndex != -1 && selectSecondIndex != -1 &&
-            tiles[selectFirstIndex].CurrentItem.colorData.colorType != ColorType.None &&
-            tiles[selectSecondIndex].CurrentItem.colorData.colorType != ColorType.None;
+            tiles[selectFirstIndex].CurrentItem.colorData.ColorType != ColorType.None &&
+            tiles[selectSecondIndex].CurrentItem.colorData.ColorType != ColorType.None;
     }
 
     public Tween RemoveItem(int index)
     {
         ColorData colorData = new ColorData();
-        colorData.colorType = ColorType.None;
+        colorData.ColorType = ColorType.None;
            
         return tiles[index].CurrentItem.SetData(colorData);
     }
