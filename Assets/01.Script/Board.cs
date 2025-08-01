@@ -117,21 +117,39 @@ public class Board : MonoBehaviour
         
 #elif UNITY_ANDROID
 if (Input.touchCount > 0)
-        {
-            Touch touch = Input.GetTouch(0);
+{
+    Touch touch = Input.GetTouch(0);
 
-            if (touch.phase == TouchPhase.Began)
+    if (touch.phase == TouchPhase.Began)
+    {
+        Vector3 touchWorldPos = Utility.GetTouchWorldPosition(touch.position);
+        Tile currentTile = tileController.FindTile(touchWorldPos);
+        int currentIndex = Array.IndexOf(tileController.TilesPositions, currentTile.transform.position);
+        
+        selectFirstIndex = currentIndex;
+        firstTouchPosition = touchWorldPos; // 시작 터치 위치 저장
+    }
+    
+    if (touch.phase == TouchPhase.Moved)
+    {
+        Vector3 currentTouchPos = Utility.GetTouchWorldPosition(touch.position);
+        if (Vector3.Distance(firstTouchPosition, currentTouchPos) > 0.1f)
+        {
+            Tile currentTile = tileController.FindTile(currentTouchPos);
+            if (currentTile != null)
             {
-                Tile currentTile = tileController.FindTile(Utility.GetTouchWorldPosition(touch.position));
-                selectFirstIndex = Array.IndexOf(tileController.TilesPositions, currentTile.transform.position);
-            }
-            
-            if (touch.phase == TouchPhase.Ended)
-            {
-                Tile lastTile = tileController.FindTile(Utility.GetTouchWorldPosition(touch.position));
-                selectSecondIndex = Array.IndexOf(tileController.TilesPositions, lastTile.transform.position);
+                int currentIndex = Array.IndexOf(tileController.TilesPositions, currentTile.transform.position);
+                if(selectFirstIndex != currentIndex)
+                    selectSecondIndex = currentIndex;
             }
         }
+    }
+    
+    if (touch.phase == TouchPhase.Ended)
+    {
+        ResetIndex();
+    }
+}
 #endif
                 
         bool isAdjustment = tileController.IsAdjacent(selectFirstIndex , selectSecondIndex);
