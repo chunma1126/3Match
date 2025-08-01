@@ -1,9 +1,14 @@
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class ItemController : MonoBehaviour
 {
-    [SerializeField] private ColorDataContainer colorDatas;
+
+    [SerializeField] private LevelData levelData;
+    
+    [Space]
+    [SerializeField] private ColorDataContainer colorDataContainer;
     [SerializeField] private Item item;
 
     private Tile[] tiles;
@@ -15,13 +20,14 @@ public class ItemController : MonoBehaviour
     
     public void CreateItem()
     {
+        int index = 0;
         foreach (var currentTile in tiles)
         {
             Vector2 spawnPos = currentTile.transform.position;
             
             Item currentItem = Instantiate(item, spawnPos, Quaternion.identity);
-            SetRandomItem(currentItem);
-                        
+            currentItem.SetData(levelData.colorDataList[index++]);
+            
             currentTile.CurrentItem = currentItem;
         }
     }
@@ -70,8 +76,8 @@ public class ItemController : MonoBehaviour
         
     private Tween SetRandomItem(Item item)
     {
-        int randIndex = Random.Range(0, colorDatas.itemList.Length);
-        return item.SetData(colorDatas.itemList[randIndex]);
+        int randIndex = Random.Range(0, colorDataContainer.itemList.Length);
+        return item.SetData(colorDataContainer.itemList[randIndex]);
     }
     
 }

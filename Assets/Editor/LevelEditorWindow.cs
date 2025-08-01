@@ -30,6 +30,12 @@ public class LevelEditorWindow : EditorWindow
         window.minSize = WINDOW_SIZE;
         
     }
+
+    public void SetLevelData(LevelData levelData)
+    {
+        this.levelData = levelData;
+        this.currentColorDataList = levelData.colorDataList;
+    }
     
     private void OnEnable()
     {
@@ -47,7 +53,6 @@ public class LevelEditorWindow : EditorWindow
         {
             levelData = AssetDatabase.LoadAssetAtPath<LevelData>(levelDataPath);
         }
-        
         
         InitializeGrid();
     }

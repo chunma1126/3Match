@@ -7,19 +7,19 @@ public class LevelDataInspector : Editor
     public override void OnInspectorGUI()
     {
         LevelData currentLevelData = (LevelData)target;
-
+        
         Vector2Int size = currentLevelData.boardSize;
         ColorData[] dataList = currentLevelData.colorDataList;
-
-        if (dataList == null || dataList.Length != size.x * size.y)
+        
+        if (dataList == null)
         {
             EditorGUILayout.HelpBox("colorDataList size does not match boardSize", MessageType.Warning);
             return;
         }
-
+        
         int cellSize = 65;
         
-        EditorGUILayout.LabelField("Color Grid", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField("Color Datas", EditorStyles.boldLabel);
         
         for (int y = 0; y < size.y; y++)
         {
@@ -40,6 +40,17 @@ public class LevelDataInspector : Editor
 
         EditorGUILayout.Space();
 
+        EditorGUILayout.BeginHorizontal();
+
+        if (GUILayout.Button("open level editor", GUILayout.Width(337), GUILayout.Height(40)))
+        {
+            var editorWindow = LevelEditorWindow.GetWindow<LevelEditorWindow>();
+            editorWindow.SetLevelData(currentLevelData);
+            
+            editorWindow.Show();
+        }
+        
+        EditorGUILayout.EndHorizontal();
         
     }
 }
