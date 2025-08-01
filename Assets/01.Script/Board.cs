@@ -31,6 +31,8 @@ public class Board : MonoBehaviour
     private UniqueQueue<int> hintQueue;
       
     private const float SWAP_DURATION = 0.23f;
+    
+    private Vector3 currentMousePosition;
         
     private void Awake()
     {
@@ -51,7 +53,17 @@ public class Board : MonoBehaviour
     private void Start()
     {
         itemController.CreateItem();
-        CheckAllTiles();
+        
+        bool hasNoMatch = matchChecker.FindHint().Count <= 0;
+        
+        if (hasNoMatch)
+        {
+            ReRollBoard();
+        }
+        else
+        {
+            CheckAllTiles();
+        }
     }
     
     private void Update()
@@ -73,19 +85,36 @@ public class Board : MonoBehaviour
         if(!canInput)return;
         
 #if UNITY_EDITOR || UNITY_STANDALONE
+        
         if (Input.GetMouseButtonDown(0))
         {
-            Tile currentTile = tileController.FindTile(Utility.GetMouseWorldPosition());
-
-            selectFirstIndex = Array.IndexOf(tileController.TilesPositions, currentTile.transform.position);
+            currentMousePosition = Utility.GetMouseWorldPosition();
+            Tile currentTile = tileController.FindTile(currentMousePosition);
+            int currentIndex = Array.IndexOf(tileController.TilesPositions, currentTile.transform.position);
+    
+            selectFirstIndex = currentIndex;
         }
-        
+
+        if (Input.GetMouseButton(0))
+        {
+            Vector3 newMousePosition = Utility.GetMouseWorldPosition();
+            if (Vector3.Distance(currentMousePosition, newMousePosition) > 0.1f) 
+            {
+                Tile currentTile = tileController.FindTile(newMousePosition); 
+                if (currentTile != null)
+                {
+                    int currentIndex = Array.IndexOf(tileController.TilesPositions, currentTile.transform.position);
+                    if(selectFirstIndex != currentIndex)
+                        selectSecondIndex = currentIndex;
+                }
+            }
+        }
+
         if (Input.GetMouseButtonUp(0))
         {
-            Tile lastTile = tileController.FindTile(Utility.GetMouseWorldPosition());
-                    
-            selectSecondIndex = Array.IndexOf(tileController.TilesPositions, lastTile.transform.position);
+            ResetIndex();
         }
+        
 #elif UNITY_ANDROID
 if (Input.touchCount > 0)
         {
@@ -201,14 +230,15 @@ if (Input.touchCount > 0)
             itemController.RefillItem().OnComplete(() =>
             {
                 bool hasNoMatch = matchChecker.FindHint().Count <= 0;
+                
                 if (hasNoMatch)
                 {
                     Invoke(nameof(ReRollBoard) , 2f);
                 }
+                
+                CheckAllTiles();
+                ResetIndex();
             });
-            
-            CheckAllTiles();
-            ResetIndex();
             
         }
         
