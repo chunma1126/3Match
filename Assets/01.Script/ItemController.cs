@@ -1,11 +1,10 @@
 using DG.Tweening;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class ItemController : MonoBehaviour
 {
 
-    [SerializeField] private LevelData levelData;
+    [SerializeField] private LevelDataContainer levelDataContainer;
     
     [Space]
     [SerializeField] private ColorDataContainer colorDataContainer;
@@ -21,6 +20,8 @@ public class ItemController : MonoBehaviour
     public void CreateItem()
     {
         int index = 0;
+        
+        LevelData levelData = levelDataContainer.Get();
         foreach (var currentTile in tiles)
         {
             Vector2 spawnPos = currentTile.transform.position;
@@ -30,6 +31,7 @@ public class ItemController : MonoBehaviour
             
             currentTile.CurrentItem = currentItem;
         }
+        
     }
     
     public Tween RefillItem()

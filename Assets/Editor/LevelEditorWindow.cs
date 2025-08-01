@@ -16,25 +16,23 @@ public class LevelEditorWindow : EditorWindow
     private static readonly Vector2Int WINDOW_SIZE = new Vector2Int(500, 800);
     
     #region Const Strings
-    private const string levelDataAssetPath = "Assets/04.SO/LevelData/";
+    private const string LEVEL_DATA_ASSET_PATH = "Assets/04.SO/LevelData/";
     private const string GRID_WIDTH = "Grid_Width";
     private const string GRID_HEIGHT = "Grid_Height";
     private const string COLOR_DATA_CONTAINER = "Color_Data_Container";
-    private const string LEVEL_DATA = "Level_Data";
     #endregion
-    
+        
     [MenuItem("Tools/Level Editor")]
     public static void ShowWindow()
     {
         var window = GetWindow<LevelEditorWindow>("LevelEditor");
         window.minSize = WINDOW_SIZE;
-        
     }
-
-    public void SetLevelData(LevelData levelData)
+    
+    public void SetLevelData(LevelData data)
     {
-        this.levelData = levelData;
-        this.currentColorDataList = levelData.colorDataList;
+        levelData = data;
+        currentColorDataList = data.Copy();
     }
     
     private void OnEnable()
@@ -46,12 +44,6 @@ public class LevelEditorWindow : EditorWindow
         if (!string.IsNullOrEmpty(colorDataContainerPath))
         {
             colorDataContainer = AssetDatabase.LoadAssetAtPath<ColorDataContainer>(colorDataContainerPath);
-        }
-                
-        string levelDataPath = EditorPrefs.GetString(LEVEL_DATA, "");
-        if (!string.IsNullOrEmpty(levelDataPath))
-        {
-            levelData = AssetDatabase.LoadAssetAtPath<LevelData>(levelDataPath);
         }
         
         InitializeGrid();
@@ -87,81 +79,77 @@ public class LevelEditorWindow : EditorWindow
         width = EditorGUILayout.IntField("Width", width);
         height = EditorGUILayout.IntField("Height", height);
         
-        float availableWidth = position.width - 20;
-        float availableHeight = position.height - 200;
-        
-        int cellWidth = Mathf.FloorToInt(availableWidth / width);
-        int cellHeight = Mathf.FloorToInt(availableHeight / height);
-        
         if (EditorGUI.EndChangeCheck())
         {
             InitializeGrid();
         }
         
         colorDataContainer = (ColorDataContainer)EditorGUILayout.ObjectField("Color Data Container", colorDataContainer, typeof(ColorDataContainer), false);
-        
+                
         EditorGUI.BeginChangeCheck();
         levelData = (LevelData)EditorGUILayout.ObjectField("Level Data", levelData, typeof(LevelData), false);
-        
         if (EditorGUI.EndChangeCheck())
         {
             if (levelData != null)
             {
-                currentColorDataList = levelData.colorDataList;
+                currentColorDataList = levelData.Copy();
                 Selection.activeObject = levelData;
+            }
+            else
+            {
+                for (var index = 0; index < currentColorDataList.Length; index++)
+                {
+                    currentColorDataList[index].ColorType = ColorType.Red;
+                    currentColorDataList[index].Color = colorDataContainer.itemList[0].Color;
+                }
             }
         }
         
         if (levelData == null)
         {
-            GUILayout.BeginVertical();         
-            GUILayout.FlexibleSpace();         
-
-            GUILayout.BeginHorizontal();       
-            GUILayout.FlexibleSpace();         
-
-            if (GUILayout.Button("Create Level Data", GUILayout.Width(150), GUILayout.Height(42)))
-            {
-                levelData = CreateNewLevelAsset(); 
-            }
-
-            GUILayout.FlexibleSpace();         
-            GUILayout.EndHorizontal();         
-    
-            GUILayout.FlexibleSpace();         
-            GUILayout.EndVertical();           
+            DrawCreateLevelDataButton();
             
             return;
         }
-                
+        
+        
         EditorGUILayout.Space();
         scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
-                        
-        if (colorDataContainer != null)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                EditorGUILayout.BeginHorizontal();
-                for (int x = 0; x < width; x++)
-                {
-                    int index = y * width + x;
-                    Color baseColor =  EditorHelper.ToGuiColor(currentColorDataList[index].Color);
-                    GUI.backgroundColor = baseColor;
-                    
-                    if (GUILayout.Button("", GUILayout.Width(cellWidth), GUILayout.Height(cellHeight)))
-                    {
-                        HandleCellClickEvent(index);
-                    }
-                    
-                    GUI.backgroundColor = Color.white;
-                }
-                EditorGUILayout.EndHorizontal();
-            }
         
+        float availableWidth = position.width - 20;
+        float availableHeight = position.height - 200;
+        
+        int cellWidth = Mathf.FloorToInt(availableWidth / width);
+        int cellHeight = Mathf.FloorToInt(availableHeight / height);
+            
+        for (int y = 0; y < height; y++)
+        {
+            EditorGUILayout.BeginHorizontal();
+            for (int x = 0; x < width; x++)
+            {
+                int index = y * width + x;
+                Color baseColor =  EditorHelper.ToGuiColor(currentColorDataList[index].Color);
+                GUI.backgroundColor = baseColor;
+                    
+                if (GUILayout.Button("", GUILayout.Width(cellWidth), GUILayout.Height(cellHeight)))
+                {
+                    HandleCellClickEvent(index);
+                }
+                    
+                GUI.backgroundColor = Color.white;
+            }
+            EditorGUILayout.EndHorizontal();
         }
         
         EditorGUILayout.Space(10);
          
+        DrawSaveButton();
+        
+        EditorGUILayout.EndScrollView();
+    }
+
+    private void DrawSaveButton()
+    {
         EditorGUILayout.BeginHorizontal();
         
         Color color = new Color(0, 0.5803921568627451f, 0.19607843137254902f,1);
@@ -176,9 +164,8 @@ public class LevelEditorWindow : EditorWindow
         }
         
         EditorGUILayout.EndHorizontal();
-        EditorGUILayout.EndScrollView();
     }
-
+    
     private void SaveLevelData()
     {
         if (levelData != null)
@@ -190,7 +177,7 @@ public class LevelEditorWindow : EditorWindow
                 colorDataArray[index].ColorType = currentColorDataList[index].ColorType;
                 colorDataArray[index].Color = currentColorDataList[index].Color;
             }
-                
+            
             levelData.colorDataList = null;
             levelData.colorDataList = colorDataArray;
                 
@@ -205,7 +192,27 @@ public class LevelEditorWindow : EditorWindow
             Debug.LogWarning("Level data is null!");
         }
     }
+    
+    private void DrawCreateLevelDataButton()
+    {
+        GUILayout.BeginVertical();         
+        GUILayout.FlexibleSpace();         
 
+        GUILayout.BeginHorizontal();       
+        GUILayout.FlexibleSpace();         
+
+        if (GUILayout.Button("Create Level Data", GUILayout.Width(150), GUILayout.Height(42)))
+        {
+            levelData = CreateNewLevelAsset(); 
+        }
+
+        GUILayout.FlexibleSpace();         
+        GUILayout.EndHorizontal();         
+    
+        GUILayout.FlexibleSpace();         
+        GUILayout.EndVertical();
+    }
+        
     private void HandleCellClickEvent(int index)
     {
         int current = (int)currentColorDataList[index].ColorType;
@@ -219,8 +226,8 @@ public class LevelEditorWindow : EditorWindow
         
         currentColorDataList[index].ColorType = (ColorType)next;
         currentColorDataList[index].Color = colorDataContainer.itemList[--next].Color;
-        
-        levelData.colorDataList[index] = currentColorDataList[index];
+                
+        //levelData.colorDataList[index] = currentColorDataList[index];
     }
     
     private LevelData CreateNewLevelAsset()
@@ -231,8 +238,8 @@ public class LevelEditorWindow : EditorWindow
         
         do
         {
-            string numberedName = index == 1 ? baseName : $"{baseName}_{index}";
-            assetPath = $"{levelDataAssetPath}/{numberedName}.asset";
+            string numberedName = index == 0 ? baseName : $"{baseName}_{index}";
+            assetPath = $"{LEVEL_DATA_ASSET_PATH}/{numberedName}.asset";
             index++;
         }
         while (AssetDatabase.LoadAssetAtPath<LevelData>(assetPath) != null);
@@ -252,6 +259,8 @@ public class LevelEditorWindow : EditorWindow
         AssetDatabase.CreateAsset(newAsset, assetPath);
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
+        
+        Selection.activeObject = newAsset;
         
         return newAsset;
     }
