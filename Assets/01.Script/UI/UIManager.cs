@@ -28,11 +28,17 @@ public class UIManager : MonoSingleton<UIManager>
         
         ChangeMoveCountText(GameManager.Instance.moveCounter.Value);
     }
-    
-    private void OnDestroy()
+
+    private void OnDisable()
     {
         GameManager.Instance.scoreCounter.OnChangeValue -= ChangeScoreText;
         GameManager.Instance.moveCounter.OnChangeValue -= ChangeMoveCountText;
+    }
+
+    private void OnDestroy()
+    {
+        /*GameManager.Instance.scoreCounter.OnChangeValue -= ChangeScoreText;
+        GameManager.Instance.moveCounter.OnChangeValue -= ChangeMoveCountText;*/
     }
     
     private void ChangeMoveCountText(float value)

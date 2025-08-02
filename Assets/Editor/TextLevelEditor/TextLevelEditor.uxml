@@ -1,0 +1,24 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/Editor/TextLevelEditor/TextLevelEditor.uss?fileID=7433441132597879392&amp;guid=32b42be84e9e03849be10f2f4272c729&amp;type=3#TextLevelEditor" />
+    <ui:VisualElement name="Root" style="flex-grow: 1; flex-direction: column;">
+        <ui:VisualElement name="FieldPanel" style="flex-basis: 55px;">
+            <uie:ObjectField label="Color Data Container" type="ColorDataContainer, Assembly-CSharp" name="ColorDataContainerField" />
+            <uie:ObjectField label="Level Data" name="LevelDataFieldField" type="LevelData, Assembly-CSharp" />
+        </ui:VisualElement>
+        <ui:VisualElement name="Panels" style="flex-grow: 1; flex-direction: row; overflow: visible; visibility: hidden; opacity: 1; display: none;">
+            <ui:VisualElement name="TextInputPanel" style="flex-grow: 1; flex-basis: 50%;">
+                <ui:TextField name="TextField" multiline="true" auto-correction="false" value="R G R G R  &#10;G R G R G  &#10;Y G R G Y  &#10;G R G R G  &#10;B Y R Y B  &#10;P B G B P  &#10;O P Y P O  &#10;I O B O I &#10;" style="flex-shrink: 1; flex-grow: 1; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
+                <ui:Button text="Convertor" class="TextEditorButton" />
+            </ui:VisualElement>
+            <ui:VisualElement name="ResultPanel" style="flex-grow: 1; flex-basis: 50%; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; color: rgb(42, 42, 42);">
+                <ui:VisualElement style="flex-grow: 1; margin-top: 30px; margin-right: 30px; margin-bottom: 30px; margin-left: 30px; background-color: rgb(42, 42, 42);">
+                    <ui:VisualElement class="ColorData" />
+                </ui:VisualElement>
+                <ui:Button text="Button" class="TextEditorButton" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement style="flex-grow: 1; justify-content: center; align-items: center;">
+            <ui:Button text="Create Level Data" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/LiberationSans.ttf?fileID=12800000&amp;guid=e3265ab4bf004d28a9537516768c1c75&amp;type=3#LiberationSans&quot;); font-size: 17px; -unity-font-style: normal; width: 180px; height: 50px;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

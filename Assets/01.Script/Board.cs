@@ -310,16 +310,16 @@ if (Input.touchCount > 0)
     
     private void CheckAllTiles()
     {
+        Debug.Log(456);
         matchChecker.CheckAllTiles(ref itemQueue);
         Match();
     }
     
     private void ReRollBoard()
     {
-        itemController.ReRollItem();
-        CheckAllTiles();
+        itemController.ReRollItem().OnComplete(CheckAllTiles);
     }
-    
+        
     #region Hint
     private void ShowHint()
     {

@@ -1,0 +1,54 @@
+#unity-text-input {
+    width: 100%;
+    height: 100%;
+    font-size: 44px;
+    -unity-font-definition: url("project://database/Assets/ImportAssets/kenney_ui-pack/Font/Kenney%20Future%20Narrow.ttf?fileID=12800000&guid=3b17f8dc4dca5184aa88cf4aca13da4c&type=3#Kenney Future Narrow");
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+}
+
+.ColorData {
+    flex-grow: 0;
+    background-color: rgb(183, 113, 113);
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    flex-shrink: 0;
+    -unity-background-scale-mode: stretch-to-fill;
+    -unity-slice-left: 0;
+    -unity-slice-top: 0;
+    -unity-slice-right: 0;
+    -unity-slice-bottom: 0;
+    width: 100px;
+    height: 100px;
+}
+
+.TextEditorButton {
+    margin-left: 4px;
+    margin-right: 4px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    width: auto;
+    flex-basis: 8%;
+    -unity-font-definition: url("project://database/Assets/ImportAssets/kenney_ui-pack/Font/Kenney%20Future.ttf?fileID=12800000&guid=aeed3ed62bd74564eb2591d1947faf56&type=3#Kenney Future");
+    -unity-font-style: normal;
+    font-size: 33px;
+}
+
+#ColorDataContainerField > Label {
+    -unity-text-align: upper-left;
+    -unity-font-definition: url("project://database/Assets/TextMesh%20Pro/Fonts/LiberationSans.ttf?fileID=12800000&guid=e3265ab4bf004d28a9537516768c1c75&type=3#LiberationSans");
+}
+
+#LevelDataFieldField > Label {
+    -unity-text-align: upper-left;
+    font-size: 12px;
+}

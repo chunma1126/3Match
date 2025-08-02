@@ -51,8 +51,11 @@ public class ItemController : MonoBehaviour
     }
     
     [ContextMenu("Set Random Item")]
-    public void ReRollItem()
+    public Tween ReRollItem()
     {
+        Debug.Log(123);
+        
+        Sequence sequence = DOTween.Sequence();
         var data = new ColorData
         {
             ColorType = ColorType.None
@@ -67,13 +70,16 @@ public class ItemController : MonoBehaviour
 
         tiles[^1].CurrentItem.SetData(data).OnComplete(() =>
         {
-            foreach (var item in tiles)
+            for (var index = 0; index < tiles.Length - 1; index++)
             {
+                var item = tiles[index];
                 SetRandomItem(item.CurrentItem);
             }
+
+            sequence.Join(SetRandomItem(tiles[^1].CurrentItem));
         });
 
-        
+        return sequence;
     }
         
     private Tween SetRandomItem(Item item)

@@ -17,7 +17,11 @@ public class LevelDataContainerInspector : Editor
                 return;
             }
             
-            (target as LevelDataContainer).levelDataList = levelDatas ;
+            (target as LevelDataContainer).levelDataList = levelDatas;
+            
+            EditorUtility.SetDirty(target);
+            AssetDatabase.SaveAssets();
         }
+        
     }
 }

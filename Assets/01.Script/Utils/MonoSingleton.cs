@@ -43,4 +43,14 @@ public class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T>
             Destroy(gameObject);
         }
     }
+    
+#if UNITY_EDITOR
+    
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStaticReference()
+    {
+        instance = null;
+    }
+#endif
+    
 }
