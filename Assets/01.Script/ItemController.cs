@@ -1,5 +1,6 @@
 using DG.Tweening;
 using UnityEngine;
+using Sequence = Unity.VisualScripting.Sequence;
 
 public class ItemController : MonoBehaviour
 {
@@ -54,25 +55,28 @@ public class ItemController : MonoBehaviour
         
     public Tween ReRollItem()
     {
-        var data = new ColorData
-        {
-            ColorType = ColorType.None
-        };
+        var data = new ColorData { ColorType = ColorType.None };
 
-        for (var index = 0; index < tiles.Length - 1; index++)
+        var sequence = DOTween.Sequence();
+        
+        for (int i = 0; i < tiles.Length - 1; i++)
         {
-            var item = tiles[index];
-            item.CurrentItem.SetData(data);
+            sequence.Join(tiles[i].CurrentItem.SetData(data));
         }
         
-        Sequence sequence = DOTween.Sequence();
-        sequence.Append(tiles[^1].CurrentItem.SetData(data));
+        Tween lastSetDataTween = tiles[^1].CurrentItem.SetData(data);
+
         
-        for (var index = 0; index < tiles.Length; index++)
+        lastSetDataTween.OnComplete(() =>
         {
-            var item = tiles[index];
-            sequence.Append(SetRandomItem(item.CurrentItem));
-        }
+            SetRandomItem(tiles[^1].CurrentItem);
+            for (int i = 0; i < tiles.Length - 1; i++)
+            {
+                SetRandomItem(tiles[i].CurrentItem);
+            }
+        });
+        
+        sequence.Join(lastSetDataTween);
         
         return sequence;
     }
@@ -83,5 +87,5 @@ public class ItemController : MonoBehaviour
         int randIndex = Random.Range(0, colorDataContainer.itemList.Length);
         return item.SetData(colorDataContainer.itemList[randIndex]);
     }
-    
+        
 }

@@ -34,15 +34,19 @@ public class Item : MonoBehaviour
     
         if (data.ColorType == ColorType.None)
         {
-            sequence.Append(transform.DOScale(scaleSize, scaleDuration));
-            sequence.Append(transform.DOScale(0f, scaleDuration));
-            sequence.AppendCallback(() => spriteRenderer.color = Color.clear);
+            sequence.Append(transform.DOScale(scaleSize, scaleDuration)).SetLink(gameObject);
+            sequence.Append(transform.DOScale(0f, scaleDuration)).SetLink(gameObject);
+            sequence.AppendCallback(() => spriteRenderer.color = Color.clear).SetLink(gameObject);
         }
         else
         {
-            sequence.Append(transform.DOScale(originalScale, scaleDuration).SetLink(gameObject));
-            var color = data.Color;
-            spriteRenderer.color = new Color(color.r, color.g, color.b, 1);
+            sequence.Append(transform.DOScale(originalScale, scaleDuration).SetLink(gameObject)).SetLink(gameObject);
+            sequence.JoinCallback(() =>
+            {
+                var color = data.Color;
+                spriteRenderer.color = new Color(color.r, color.g, color.b, 1);
+            }).SetLink(gameObject);
+            
         }
         
         return sequence;

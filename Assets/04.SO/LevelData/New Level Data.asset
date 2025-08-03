@@ -14,14 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boardSize: {x: 5, y: 8}
   colorDataList:
-  - ColorType: 2
-    Color: {r: 1, g: 0.4745098, b: 0.2509804, a: 1}
-  - ColorType: 2
-    Color: {r: 1, g: 0.4745098, b: 0.2509804, a: 1}
+  - ColorType: 1
+    Color: {r: 1, g: 0.32156864, b: 0.32156864, a: 1}
+  - ColorType: 7
+    Color: {r: 0.4392157, g: 0.43529412, b: 0.85490197, a: 1}
   - ColorType: 3
     Color: {r: 1, g: 0.8509804, b: 0.47843137, a: 1}
-  - ColorType: 2
-    Color: {r: 1, g: 0.4745098, b: 0.2509804, a: 1}
+  - ColorType: 4
+    Color: {r: 0.2, g: 0.8509804, b: 0.69803923, a: 1}
   - ColorType: 2
     Color: {r: 1, g: 0.4745098, b: 0.2509804, a: 1}
   - ColorType: 2
@@ -30,67 +30,67 @@ MonoBehaviour:
     Color: {r: 1, g: 0.8509804, b: 0.47843137, a: 1}
   - ColorType: 4
     Color: {r: 0.2, g: 0.8509804, b: 0.69803923, a: 1}
-  - ColorType: 3
-    Color: {r: 1, g: 0.8509804, b: 0.47843137, a: 1}
   - ColorType: 2
     Color: {r: 1, g: 0.4745098, b: 0.2509804, a: 1}
-  - ColorType: 1
-    Color: {r: 1, g: 0.32156864, b: 0.32156864, a: 1}
-  - ColorType: 1
-    Color: {r: 1, g: 0.32156864, b: 0.32156864, a: 1}
+  - ColorType: 6
+    Color: {r: 0.2509804, g: 0.2509804, b: 0.47843137, a: 1}
   - ColorType: 3
     Color: {r: 1, g: 0.8509804, b: 0.47843137, a: 1}
-  - ColorType: 1
-    Color: {r: 1, g: 0.32156864, b: 0.32156864, a: 1}
-  - ColorType: 1
-    Color: {r: 1, g: 0.32156864, b: 0.32156864, a: 1}
-  - ColorType: 7
-    Color: {r: 0.4392157, g: 0.43529412, b: 0.85490197, a: 1}
+  - ColorType: 4
+    Color: {r: 0.2, g: 0.8509804, b: 0.69803923, a: 1}
+  - ColorType: 2
+    Color: {r: 1, g: 0.4745098, b: 0.2509804, a: 1}
   - ColorType: 6
     Color: {r: 0.2509804, g: 0.2509804, b: 0.47843137, a: 1}
   - ColorType: 1
     Color: {r: 1, g: 0.32156864, b: 0.32156864, a: 1}
+  - ColorType: 4
+    Color: {r: 0.2, g: 0.8509804, b: 0.69803923, a: 1}
+  - ColorType: 2
+    Color: {r: 1, g: 0.4745098, b: 0.2509804, a: 1}
   - ColorType: 6
     Color: {r: 0.2509804, g: 0.2509804, b: 0.47843137, a: 1}
-  - ColorType: 7
-    Color: {r: 0.4392157, g: 0.43529412, b: 0.85490197, a: 1}
   - ColorType: 1
     Color: {r: 1, g: 0.32156864, b: 0.32156864, a: 1}
   - ColorType: 2
     Color: {r: 1, g: 0.4745098, b: 0.2509804, a: 1}
+  - ColorType: 2
+    Color: {r: 1, g: 0.4745098, b: 0.2509804, a: 1}
+  - ColorType: 6
+    Color: {r: 0.2509804, g: 0.2509804, b: 0.47843137, a: 1}
   - ColorType: 1
     Color: {r: 1, g: 0.32156864, b: 0.32156864, a: 1}
   - ColorType: 2
     Color: {r: 1, g: 0.4745098, b: 0.2509804, a: 1}
-  - ColorType: 1
-    Color: {r: 1, g: 0.32156864, b: 0.32156864, a: 1}
-  - ColorType: 1
-    Color: {r: 1, g: 0.32156864, b: 0.32156864, a: 1}
   - ColorType: 3
     Color: {r: 1, g: 0.8509804, b: 0.47843137, a: 1}
+  - ColorType: 6
+    Color: {r: 0.2509804, g: 0.2509804, b: 0.47843137, a: 1}
+  - ColorType: 1
+    Color: {r: 1, g: 0.32156864, b: 0.32156864, a: 1}
   - ColorType: 2
     Color: {r: 1, g: 0.4745098, b: 0.2509804, a: 1}
   - ColorType: 3
     Color: {r: 1, g: 0.8509804, b: 0.47843137, a: 1}
+  - ColorType: 4
+    Color: {r: 0.2, g: 0.8509804, b: 0.69803923, a: 1}
   - ColorType: 1
     Color: {r: 1, g: 0.32156864, b: 0.32156864, a: 1}
+  - ColorType: 2
+    Color: {r: 1, g: 0.4745098, b: 0.2509804, a: 1}
   - ColorType: 3
     Color: {r: 1, g: 0.8509804, b: 0.47843137, a: 1}
-  - ColorType: 1
-    Color: {r: 1, g: 0.32156864, b: 0.32156864, a: 1}
-  - ColorType: 3
-    Color: {r: 1, g: 0.8509804, b: 0.47843137, a: 1}
-  - ColorType: 1
-    Color: {r: 1, g: 0.32156864, b: 0.32156864, a: 1}
-  - ColorType: 3
-    Color: {r: 1, g: 0.8509804, b: 0.47843137, a: 1}
-  - ColorType: 5
-    Color: {r: 0.20392157, g: 0.6745098, b: 0.8784314, a: 1}
+  - ColorType: 4
+    Color: {r: 0.2, g: 0.8509804, b: 0.69803923, a: 1}
   - ColorType: 5
     Color: {r: 0.20392157, g: 0.6745098, b: 0.8784314, a: 1}
   - ColorType: 2
     Color: {r: 1, g: 0.4745098, b: 0.2509804, a: 1}
+  - ColorType: 3
+    Color: {r: 1, g: 0.8509804, b: 0.47843137, a: 1}
+  - ColorType: 4
+    Color: {r: 0.2, g: 0.8509804, b: 0.69803923, a: 1}
   - ColorType: 5
     Color: {r: 0.20392157, g: 0.6745098, b: 0.8784314, a: 1}
-  - ColorType: 5
-    Color: {r: 0.20392157, g: 0.6745098, b: 0.8784314, a: 1}
+  - ColorType: 1
+    Color: {r: 1, g: 0.32156864, b: 0.32156864, a: 1}

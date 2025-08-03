@@ -228,7 +228,7 @@ if (Input.touchCount > 0)
         if (itemQueue.Count <= 0)
         {
             canInput = true;
-            Debug.Log("item queue is empty");
+            //Debug.Log("item queue is empty");
             return;
         }
         
@@ -330,7 +330,13 @@ if (Input.touchCount > 0)
     [ContextMenu("ReRoll Board")]
     public void ReRollBoard()
     {
-        itemController.ReRollItem().OnComplete(CheckAllTiles);
+        canInput = false;
+        itemController.ReRollItem().OnComplete(()=>
+        {
+            
+            CheckAllTiles();
+        });
+        
     }
     
     #region Hint
