@@ -28,35 +28,26 @@ public class Item : MonoBehaviour
     public Tween SetData(ColorData data)
     {
         colorData = data;
-        
-        Tween tween = null;
-        
+        gameObject.name = data.ColorType.ToString();
+    
+        Sequence sequence = DOTween.Sequence();
+    
         if (data.ColorType == ColorType.None)
         {
-            Sequence sequence = DOTween.Sequence();
             sequence.Append(transform.DOScale(scaleSize, scaleDuration));
             sequence.Append(transform.DOScale(0f, scaleDuration));
-            sequence.AppendCallback(() =>
-            {
-                spriteRenderer.color = Color.clear;
-            });
-            
-            tween = sequence;
+            sequence.AppendCallback(() => spriteRenderer.color = Color.clear);
         }
         else
         {
-            Sequence sequence = DOTween.Sequence();
-            sequence.Append(transform.DOScale(originalScale , scaleDuration).SetLink(gameObject));
-                        
-            var color = colorData.Color;
-            spriteRenderer.color = new Color(color.r ,color.g ,color.b  ,1);
-            
-            tween = sequence;
+            sequence.Append(transform.DOScale(originalScale, scaleDuration).SetLink(gameObject));
+            var color = data.Color;
+            spriteRenderer.color = new Color(color.r, color.g, color.b, 1);
         }
         
-        gameObject.name = colorData.ColorType.ToString();
-        return tween;
+        return sequence;
     }
+
     
     public SpriteRenderer GetSpriteRenderer() => spriteRenderer;
     

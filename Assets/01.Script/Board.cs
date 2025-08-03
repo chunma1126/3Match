@@ -52,18 +52,22 @@ public class Board : MonoBehaviour
     
     private void Start()
     {
-        itemController.CreateItem();
-        
-        bool hasNoMatch = matchChecker.FindHint().Count <= 0;
-        
-        if (hasNoMatch)
+        itemController.CreateItem().OnComplete(() =>
         {
-            ReRollBoard();
-        }
-        else
-        {
-            CheckAllTiles();
-        }
+            bool hasNoMatch = matchChecker.FindHint().Count <= 0;
+        
+            if (hasNoMatch)
+            {
+                ReRollBoard();
+            }
+            else
+            {
+                CheckAllTiles();
+            }
+            
+            canInput = true;        
+        });
+                
     }
     
     private void Update()
@@ -77,13 +81,12 @@ public class Board : MonoBehaviour
             HideHint();
         }
         
-        SwapProcess();
+        if(canInput)
+            SwapProcess();
     }
-        
+    
     private void SwapProcess()
     {
-        if(!canInput)return;
-        
 #if UNITY_EDITOR || UNITY_STANDALONE
         
         if (Input.GetMouseButtonDown(0))
@@ -127,13 +130,13 @@ if (Input.touchCount > 0)
         int currentIndex = Array.IndexOf(tileController.TilesPositions, currentTile.transform.position);
         
         selectFirstIndex = currentIndex;
-        firstTouchPosition = touchWorldPos; // 시작 터치 위치 저장
+        currentMousePosition = touchWorldPos; // 시작 터치 위치 저장
     }
     
     if (touch.phase == TouchPhase.Moved)
     {
         Vector3 currentTouchPos = Utility.GetTouchWorldPosition(touch.position);
-        if (Vector3.Distance(firstTouchPosition, currentTouchPos) > 0.1f)
+        if (Vector3.Distance(currentMousePosition, currentTouchPos) > 0.1f)
         {
             Tile currentTile = tileController.FindTile(currentTouchPos);
             if (currentTile != null)
@@ -158,6 +161,8 @@ if (Input.touchCount > 0)
         
         if (canSwap)
         {
+            canInput = false;
+            
             TrySwap();
         }
         
@@ -165,104 +170,39 @@ if (Input.touchCount > 0)
         
     private void TrySwap()
     {
-        if (selectFirstIndex == -1 || selectSecondIndex == -1)
+        if (selectFirstIndex == -1 || selectSecondIndex == -1 || !GameManager.Instance.HasMoveCount)
         {
-            ResetIndex();
-            return;
-        }
-        
-        if (!GameManager.Instance.HasMoveCount)
-        {
-            PopupManager.Instance.PopUp(PopupType.Add);
+            if (!GameManager.Instance.HasMoveCount)
+            {
+                PopupManager.Instance.PopUp(PopupType.Add);
+            }
+            
+            canInput = true;
             ResetIndex();
             return;
         }
         
         Swap(selectFirstIndex, selectSecondIndex).OnComplete(() =>
         {
-            
-            if (matchChecker.IsMatch(selectFirstIndex,selectSecondIndex,ref itemQueue))
+            bool match = matchChecker.IsMatch(selectFirstIndex, selectSecondIndex, ref itemQueue);
+            if (match)
             {
-                //match
                 GameManager.Instance.moveCounter.Add(-1);
                 Match();
             }
             else
             {
                 //swap undo
-                Swap(selectFirstIndex, selectSecondIndex).OnComplete(ResetIndex);
+                Swap(selectFirstIndex, selectSecondIndex).OnComplete(() =>
+                {
+                    ResetIndex();
+                    canInput = true;
+                });
             }
         });
         
     }
     
-    private void Match()
-    {
-        if(itemQueue.Count <= 0)return;
-        
-        GameManager.Instance.AddScore(50);
-        
-        AudioManager.Instance.PlaySound(matchSound);
-        lastMatchTime = Time.time;
-        
-        // Swap must start from the minimum index
-        itemQueue = new UniqueQueue<int>(itemQueue.OrderBy(i => i));
-        
-        int size = itemQueue.Count - 1;
-        for (int i = 0; i <size; i++)
-        {
-            int index = itemQueue.Dequeue();
-            tileController.RemoveItem(index);
-            itemQueue.Enqueue(index); 
-        }
-        
-        int lastIndex = itemQueue.Dequeue();
-        itemQueue.Enqueue(lastIndex); 
-        
-        tileController.RemoveItem(lastIndex).OnComplete(() =>
-        {
-            int total = itemQueue.Count;
-            int completed = 0;
-            
-            var queue = new UniqueQueue<int>(itemQueue);
-            itemQueue.Clear(); 
-            
-            foreach (int index in queue)
-            {
-                ApplyGravity(index, ()=>
-                {
-                    completed = GravityComplete(completed, total);
-                });    
-            }
-                        
-        });
-        
-    }
-
-    private int GravityComplete(int completed, int total)
-    {
-        ++completed;
-        if (completed >= total)
-        {
-            completed = 0;
-            itemController.RefillItem().OnComplete(() =>
-            {
-                bool hasNoMatch = matchChecker.FindHint().Count <= 0;
-                
-                if (hasNoMatch)
-                {
-                    Invoke(nameof(ReRollBoard) , 2f);
-                }
-                
-                CheckAllTiles();
-                ResetIndex();
-            });
-            
-        }
-        
-        return completed;
-    }
-
     private Tween Swap(int currentIndex,int lastIndex)
     {
         canInput = false;
@@ -282,13 +222,56 @@ if (Input.touchCount > 0)
         
         return sequence;
     }
-    
-    private void ResetIndex()
+        
+    private void Match()
     {
-        canInput = true;
-        selectFirstIndex = -1;
-        selectSecondIndex = -1;
+        if (itemQueue.Count <= 0)
+        {
+            canInput = true;
+            Debug.Log("item queue is empty");
+            return;
+        }
+        
+        GameManager.Instance.AddScore(50);
+        AudioManager.Instance.PlaySound(matchSound);
+        lastMatchTime = Time.time;
+        
+            
+        // Swap must start from the minimum index
+        itemQueue = new UniqueQueue<int>(itemQueue.OrderBy(i => i));
+        
+        int size = itemQueue.Count - 1;
+        for (int i = 0; i < size; i++)
+        {
+            int index = itemQueue.Dequeue();
+            tileController.RemoveItem(index);
+            itemQueue.Enqueue(index); 
+        }
+        
+        int lastIndex = itemQueue.Dequeue();
+        itemQueue.Enqueue(lastIndex); 
+        
+        tileController.RemoveItem(lastIndex).OnComplete(() =>
+        {
+            var queue = new UniqueQueue<int>(itemQueue);
+                        
+            itemQueue.Clear(); 
+            int total = queue.Count;
+            int completed = 0;
+            
+                        
+            foreach (int index in queue)
+            {
+                ApplyGravity(index, ()=>
+                {
+                    completed = GravityComplete(completed, total);
+                });    
+            }
+            
+        });
+        
     }
+    
         
     private void ApplyGravity(int index,Action callback = null)
     {
@@ -300,26 +283,56 @@ if (Input.touchCount > 0)
             return;
         }
                 
-        canInput = false;
-        
         Swap(index, aboveIndex).OnComplete(() =>
         {
             ApplyGravity(aboveIndex,callback); 
         });
     }
     
+    private int GravityComplete(int completed, int total)
+    {
+        ++completed;
+        if (completed >= total)
+        {
+            completed = 0;
+            itemController.RefillItem().OnComplete(() =>
+            {
+                bool hasNoMatch = matchChecker.FindHint().Count <= 0;
+                
+                if (hasNoMatch)
+                {
+                    Invoke(nameof(ReRollBoard) , 2f);
+                }
+                else
+                {
+                    CheckAllTiles();
+                    ResetIndex();
+                }
+            });
+                        
+        }
+        
+        return completed;
+    }
+    
     private void CheckAllTiles()
     {
-        Debug.Log(456);
         matchChecker.CheckAllTiles(ref itemQueue);
         Match();
     }
     
-    private void ReRollBoard()
+    private void ResetIndex()
+    {
+        selectFirstIndex = -1;
+        selectSecondIndex = -1;
+    }
+    
+    [ContextMenu("ReRoll Board")]
+    public void ReRollBoard()
     {
         itemController.ReRollItem().OnComplete(CheckAllTiles);
     }
-        
+    
     #region Hint
     private void ShowHint()
     {
@@ -334,7 +347,7 @@ if (Input.touchCount > 0)
         }
         
     }
-
+    
     private void HideHint()
     {
         isShowHint = false;

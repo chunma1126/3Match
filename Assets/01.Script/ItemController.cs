@@ -17,8 +17,9 @@ public class ItemController : MonoBehaviour
         this.tiles = tiles;
     }
     
-    public void CreateItem()
+    public Tween CreateItem()
     {
+        Tween tween = null;
         int index = 0;
         
         LevelData levelData = levelDataContainer.Get();
@@ -27,11 +28,12 @@ public class ItemController : MonoBehaviour
             Vector2 spawnPos = currentTile.transform.position;
             
             Item currentItem = Instantiate(item, spawnPos, Quaternion.identity);
-            currentItem.SetData(levelData.colorDataList[index++]);
+            tween = currentItem.SetData(levelData.colorDataList[index++]);
             
             currentTile.CurrentItem = currentItem;
         }
         
+        return tween;
     }
     
     public Tween RefillItem()
@@ -49,38 +51,32 @@ public class ItemController : MonoBehaviour
         
         return tween;
     }
-    
-    [ContextMenu("Set Random Item")]
+        
     public Tween ReRollItem()
     {
-        Debug.Log(123);
-        
-        Sequence sequence = DOTween.Sequence();
         var data = new ColorData
         {
             ColorType = ColorType.None
         };
-        
+
         for (var index = 0; index < tiles.Length - 1; index++)
         {
             var item = tiles[index];
-           
             item.CurrentItem.SetData(data);
         }
-
-        tiles[^1].CurrentItem.SetData(data).OnComplete(() =>
+        
+        Sequence sequence = DOTween.Sequence();
+        sequence.Append(tiles[^1].CurrentItem.SetData(data));
+        
+        for (var index = 0; index < tiles.Length; index++)
         {
-            for (var index = 0; index < tiles.Length - 1; index++)
-            {
-                var item = tiles[index];
-                SetRandomItem(item.CurrentItem);
-            }
-
-            sequence.Join(SetRandomItem(tiles[^1].CurrentItem));
-        });
-
+            var item = tiles[index];
+            sequence.Append(SetRandomItem(item.CurrentItem));
+        }
+        
         return sequence;
     }
+
         
     private Tween SetRandomItem(Item item)
     {
