@@ -5,7 +5,7 @@ using UnityEngine;
 public static class LevelDataCreator
 {
     private const string LEVEL_DATA_ASSET_PATH = "Assets/04.SO/LevelData/";
-    private static readonly Color DEFAULT_COLOR = new Color(255/255,82/255,82/255,1);
+    private static readonly Color DEFAULT_COLOR = new Color(255f/255f,82f/255f,82f/255f,1);
     
     public static LevelData CreateNewLevelAsset(int width , int height)
     {
@@ -29,8 +29,7 @@ public static class LevelDataCreator
             newAsset.colorDataList[i].ColorType = ColorType.Red;
             newAsset.colorDataList[i].Color = DEFAULT_COLOR;
         }
-
-
+        
         newAsset.boardSize = new Vector2Int(width, height);
         newAsset.name = baseName;
         
