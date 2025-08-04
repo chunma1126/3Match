@@ -3,7 +3,7 @@
     <ui:VisualElement name="Root" style="flex-grow: 1; flex-direction: column;">
         <ui:VisualElement name="FieldPanel" style="flex-basis: 55px;">
             <uie:ObjectField label="Color Data Container" type="ColorDataContainer, Assembly-CSharp" name="ColorDataContainerField" />
-            <uie:ObjectField label="Level Data" name="LevelDataFieldField" type="LevelData, Assembly-CSharp" />
+            <uie:ObjectField label="Level Data" name="LevelDataField" type="LevelData, Assembly-CSharp" />
         </ui:VisualElement>
         <ui:VisualElement name="Panels" style="flex-grow: 1; flex-direction: row; overflow: visible; visibility: hidden; opacity: 1; display: none;">
             <ui:VisualElement name="TextInputPanel" style="flex-grow: 1; flex-basis: 50%;">
@@ -18,7 +18,7 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement style="flex-grow: 1; justify-content: center; align-items: center;">
-            <ui:Button text="Create Level Data" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/LiberationSans.ttf?fileID=12800000&amp;guid=e3265ab4bf004d28a9537516768c1c75&amp;type=3#LiberationSans&quot;); font-size: 17px; -unity-font-style: normal; width: 180px; height: 50px;" />
+            <ui:Button text="Create Level Data" name="CreateButton" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/LiberationSans.ttf?fileID=12800000&amp;guid=e3265ab4bf004d28a9537516768c1c75&amp;type=3#LiberationSans&quot;); font-size: 17px; -unity-font-style: normal; width: 180px; height: 50px;" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

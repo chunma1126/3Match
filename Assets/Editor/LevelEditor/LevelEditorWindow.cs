@@ -1,4 +1,3 @@
-using System.Runtime.Remoting.Messaging;
 using UnityEditor;
 using UnityEngine;
 
@@ -16,7 +15,6 @@ public class LevelEditorWindow : EditorWindow
     private static readonly Vector2Int WINDOW_SIZE = new Vector2Int(500, 800);
     
     #region Const Strings
-    private const string LEVEL_DATA_ASSET_PATH = "Assets/04.SO/LevelData/";
     private const string GRID_WIDTH = "Grid_Width";
     private const string GRID_HEIGHT = "Grid_Height";
     private const string COLOR_DATA_CONTAINER = "Color_Data_Container";
@@ -203,7 +201,14 @@ public class LevelEditorWindow : EditorWindow
 
         if (GUILayout.Button("Create Level Data", GUILayout.Width(150), GUILayout.Height(42)))
         {
-            levelData = CreateNewLevelAsset(); 
+            levelData = LevelDataCreator.CreateNewLevelAsset(width , height); 
+            
+            for (var i = 0; i < levelData.colorDataList.Length; i++)
+            {
+                levelData.colorDataList[i].ColorType = ColorType.Red;
+                levelData.colorDataList[i].Color = colorDataContainer.itemList[0].Color;
+            }
+            
         }
 
         GUILayout.FlexibleSpace();         
@@ -230,40 +235,7 @@ public class LevelEditorWindow : EditorWindow
         //levelData.colorDataList[index] = currentColorDataList[index];
     }
     
-    private LevelData CreateNewLevelAsset()
-    {
-        string baseName = "New Level Data";
-        string assetPath = "";
-        int index = 0;
-        
-        do
-        {
-            string numberedName = index == 0 ? baseName : $"{baseName}_{index}";
-            assetPath = $"{LEVEL_DATA_ASSET_PATH}/{numberedName}.asset";
-            index++;
-        }
-        while (AssetDatabase.LoadAssetAtPath<LevelData>(assetPath) != null);
-        
-        LevelData newAsset = ScriptableObject.CreateInstance<LevelData>();
-        newAsset.colorDataList = new ColorData[width * height];
-        
-        for (var i = 0; i < newAsset.colorDataList.Length; i++)
-        {
-            newAsset.colorDataList[i].ColorType = ColorType.Red;
-            newAsset.colorDataList[i].Color = colorDataContainer.itemList[0].Color;
-        }
-        
-        newAsset.boardSize = new Vector2Int(width, height);
-        newAsset.name = baseName;
-        
-        AssetDatabase.CreateAsset(newAsset, assetPath);
-        AssetDatabase.SaveAssets();
-        AssetDatabase.Refresh();
-        
-        Selection.activeObject = newAsset;
-        
-        return newAsset;
-    }
+    
     
 }
 

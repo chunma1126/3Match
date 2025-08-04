@@ -2,7 +2,7 @@
 using UnityEngine;
 
 [CustomEditor(typeof(LevelDataContainer))]
-public class LevelDataContainerInspector : Editor
+public class LevelDataContainerInspector : UnityEditor.Editor
 {
     public override void OnInspectorGUI()
     {
