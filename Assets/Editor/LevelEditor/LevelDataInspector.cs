@@ -42,7 +42,7 @@ public class LevelDataInspector : Editor
 
         EditorGUILayout.BeginHorizontal();
 
-        if (GUILayout.Button("open level editor", GUILayout.Width(337), GUILayout.Height(40)))
+        if (GUILayout.Button("Open Level Editor", GUILayout.Width(337), GUILayout.Height(40)))
         {
             var editorWindow = LevelEditorWindow.GetWindow<LevelEditorWindow>();
             editorWindow.SetLevelData(currentLevelData);
@@ -51,6 +51,19 @@ public class LevelDataInspector : Editor
         }
         
         EditorGUILayout.EndHorizontal();
+        
+        EditorGUILayout.BeginHorizontal();
+        
+        if (GUILayout.Button("Open Text Editor", GUILayout.Width(337), GUILayout.Height(40)))
+        {
+            var editorWindow = LevelEditorWindow.GetWindow<TextLevelEditor>();
+            editorWindow.SetLevelData(currentLevelData);
+            
+            editorWindow.Show();
+        }
+        
+        EditorGUILayout.EndHorizontal();
+        
         
     }
 }

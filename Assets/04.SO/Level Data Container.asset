@@ -13,4 +13,7 @@ MonoBehaviour:
   m_Name: Level Data Container
   m_EditorClassIdentifier: 
   levelDataList:
+  - {fileID: 11400000, guid: bec569cad44591b4c85a8b4e117acb5b, type: 2}
+  - {fileID: 11400000, guid: d49af01cca2cc3541bbdfa192f2b3261, type: 2}
+  - {fileID: 11400000, guid: c6ba5ef4ddd615e428c7cdfe0ec86cde, type: 2}
   - {fileID: 11400000, guid: 4fa1478820940c048ba856214cec4fee, type: 2}
