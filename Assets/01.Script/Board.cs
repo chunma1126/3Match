@@ -170,11 +170,11 @@ if (Input.touchCount > 0)
         
     private void TrySwap()
     {
-        if (selectFirstIndex == -1 || selectSecondIndex == -1 || !GameManager.Instance.HasMoveCount)
+        if (selectFirstIndex == -1 || selectSecondIndex == -1 || !GameManager.Inst.HasMoveCount)
         {
-            if (!GameManager.Instance.HasMoveCount)
+            if (!GameManager.Inst.HasMoveCount)
             {
-                PopupManager.Instance.PopUp(PopupType.Add);
+                PopupManager.Inst.PopUp(PopupType.Add);
             }
             
             canInput = true;
@@ -187,7 +187,7 @@ if (Input.touchCount > 0)
             bool match = matchChecker.IsMatch(selectFirstIndex, selectSecondIndex, ref itemQueue);
             if (match)
             {
-                GameManager.Instance.moveCounter.Add(-1);
+                GameManager.Inst.moveCounter.Add(-1);
                 Match();
             }
             else
@@ -231,12 +231,15 @@ if (Input.touchCount > 0)
             //Debug.Log("item queue is empty");
             return;
         }
+            
+        GameManager.Inst.AddScore(25 * itemQueue.Count);
         
-        GameManager.Instance.AddScore(50);
-        AudioManager.Instance.PlaySound(matchSound);
+        if(itemQueue.Count > 3)
+            GameManager.Inst.bombCounter.Add(1);
+        
+        AudioManager.Inst.PlaySound(matchSound);
         lastMatchTime = Time.time;
         
-            
         // Swap must start from the minimum index
         itemQueue = new UniqueQueue<int>(itemQueue.OrderBy(i => i));
         
@@ -333,7 +336,7 @@ if (Input.touchCount > 0)
         canInput = false;
         itemController.ReRollItem().OnComplete(()=>
         {
-            
+            ResetIndex();
             CheckAllTiles();
         });
         

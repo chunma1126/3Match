@@ -14,6 +14,9 @@ public class UIManager : MonoSingleton<UIManager>
     [Header("MoveCount info")]
     [SerializeField] private TextMeshProUGUI moveCountText;
         
+    [Header("BombCount info")]
+    [SerializeField] private TextMeshProUGUI bombCountText;
+    
     protected override void Awake()
     {
         base.Awake();
@@ -23,16 +26,20 @@ public class UIManager : MonoSingleton<UIManager>
     
     private void Start()
     {
-        GameManager.Instance.scoreCounter.OnChangeValue += ChangeScoreText;
-        GameManager.Instance.moveCounter.OnChangeValue += ChangeMoveCountText;
+        GameManager.Inst.scoreCounter.OnChangeValue += ChangeScoreText;
+        GameManager.Inst.moveCounter.OnChangeValue += ChangeMoveCountText;
+        GameManager.Inst.bombCounter.OnChangeValue += ChangeBombCount;
         
-        ChangeMoveCountText(GameManager.Instance.moveCounter.Value);
+        ChangeMoveCountText(GameManager.Inst.moveCounter.Value);
+        ChangeBombCount(GameManager.Inst.bombCounter.Value);
     }
 
     private void OnDisable()
     {
-        GameManager.Instance.scoreCounter.OnChangeValue -= ChangeScoreText;
-        GameManager.Instance.moveCounter.OnChangeValue -= ChangeMoveCountText;
+        GameManager.Inst.scoreCounter.OnChangeValue -= ChangeScoreText;
+        GameManager.Inst.moveCounter.OnChangeValue -= ChangeMoveCountText;
+        GameManager.Inst.bombCounter.OnChangeValue -= ChangeBombCount;
+        
     }
 
     private void OnDestroy()
@@ -65,6 +72,11 @@ public class UIManager : MonoSingleton<UIManager>
             scoreText.text = ((int)score).ToString("D7");
             yield return scoreWait;
         }
+    }
+
+    private void ChangeBombCount(float value)
+    {
+        bombCountText.SetText(value.ToString());
     }
     
         

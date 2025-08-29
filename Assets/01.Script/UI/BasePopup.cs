@@ -36,11 +36,11 @@ public abstract class BasePopup : MonoBehaviour
         popupGroup.interactable = true;
         popupGroup.blocksRaycasts = true;
                 
-        popupGroup.DOFade(1, 0.5f).OnComplete(() =>
+        popupGroup.DOFade(1, 0.5f).SetLink(gameObject).OnComplete(() =>
         {
             elementsGroup.interactable = true;
             elementsGroup.blocksRaycasts = true;
-            elementsGroup.DOFade(1, elementsFadeDuration);
+            elementsGroup.DOFade(1, elementsFadeDuration).SetLink(gameObject);
         });
     }
 
@@ -49,11 +49,11 @@ public abstract class BasePopup : MonoBehaviour
         elementsGroup.interactable = false;
         elementsGroup.blocksRaycasts = false;
     
-        elementsGroup.DOFade(0, elementsFadeDuration).OnComplete(() =>
+        elementsGroup.DOFade(0, elementsFadeDuration).SetLink(gameObject).OnComplete(() =>
         {
             popupGroup.interactable = false;
             popupGroup.blocksRaycasts = false;
-            popupGroup.DOFade(0, 0.5f);
+            popupGroup.DOFade(0, 0.5f).SetLink(gameObject);
         });
     }
 }

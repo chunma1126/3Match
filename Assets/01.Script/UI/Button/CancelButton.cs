@@ -6,7 +6,7 @@ public class CancelButton : Button
     
     protected override void Click()
     {
-        PopupManager.Instance.PopDown(popupType);
+        PopupManager.Inst.PopDown(popupType);
     }
     
 }

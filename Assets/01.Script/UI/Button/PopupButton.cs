@@ -6,7 +6,7 @@ public class PopupButton : Button
     
     protected override void Click()
     {
-        PopupManager.Instance.PopUp(popupType);
+        PopupManager.Inst.PopUp(popupType);
     }
             
 }

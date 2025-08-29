@@ -50,7 +50,14 @@ namespace MaskTransitions
 
             SetupMaxSize();
         }
-
+        
+        private void OnDestroy()
+        {
+            DOTween.Kill(maskRect);
+            DOTween.Kill(parentMaskRect);
+            DOTween.Kill(cutoutMask);
+        }
+        
         #region Setup
         void SetupMaxSize()
         {
@@ -68,9 +75,10 @@ namespace MaskTransitions
             maskRect.sizeDelta = Vector2.zero;
             parentMaskRect.sizeDelta = Vector2.zero;
 
-            maskRect.DOSizeDelta(new Vector2(maxSize, maxSize), animationTime).SetEase(Ease.InOutQuad);
+            maskRect.DOSizeDelta(new Vector2(maxSize, maxSize), animationTime).SetEase(Ease.InOutQuad).SetLink(gameObject);
             if (rotation)
-                maskRect.DORotate(new Vector3(0, 0, 180), animationTime, RotateMode.FastBeyond360).SetEase(Ease.InOutQuad);
+                maskRect.DORotate(new Vector3(0, 0, 180), animationTime, RotateMode.FastBeyond360)
+                    .SetEase(Ease.InOutQuad).SetLink(gameObject);
         }
 
         Tween StartAnimationForLoad(float? totalTime = null)
@@ -81,14 +89,16 @@ namespace MaskTransitions
             parentMaskRect.sizeDelta = Vector2.zero;
             maskRect.rotation = Quaternion.identity;
 
-            Tween blueTweenSize = maskRect.DOSizeDelta(new Vector2(maxSize, maxSize), animationTime).SetEase(Ease.InOutQuad);
+            Tween blueTweenSize = maskRect.DOSizeDelta(new Vector2(maxSize, maxSize), animationTime)
+                .SetEase(Ease.InOutQuad).SetLink(gameObject);
 
-            Sequence animationSequence = DOTween.Sequence().Join(blueTweenSize);
+            Sequence animationSequence = DOTween.Sequence().Join(blueTweenSize).SetLink(gameObject);
 
             if (rotation)
             {
-                Tween blueTweenRotate = maskRect.DORotate(new Vector3(0, 0, 180), animationTime).SetEase(Ease.InOutQuad);
-                animationSequence.Join(blueTweenRotate);
+                Tween blueTweenRotate = maskRect.DORotate(new Vector3(0, 0, 180), animationTime).SetEase(Ease.InOutQuad)
+                    .SetLink(gameObject);
+                animationSequence.Join(blueTweenRotate).SetLink(gameObject);
             }
 
             return animationSequence;
@@ -103,9 +113,11 @@ namespace MaskTransitions
             parentMaskRect.sizeDelta = Vector2.zero;
             parentMaskRect.rotation = Quaternion.identity;
 
-            parentMaskRect.DOSizeDelta(new Vector2(maxSize, maxSize), animationTime).SetEase(Ease.InOutQuad);
+            parentMaskRect.DOSizeDelta(new Vector2(maxSize, maxSize), animationTime).SetEase(Ease.InOutQuad)
+                .SetLink(gameObject);
             if (rotation)
-                parentMaskRect.DORotate(new Vector3(0, 0, 180), animationTime).SetEase(Ease.InOutQuad);
+                parentMaskRect.DORotate(new Vector3(0, 0, 180), animationTime).SetEase(Ease.InOutQuad)
+                    .SetLink(gameObject);
         }
         #endregion
 

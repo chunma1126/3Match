@@ -122,7 +122,7 @@ public class ShowAddButton : MonoBehaviour
     private void AddReward()
     {
         float randomValue = Random.Range(minMoveCounterInterment, maxMoveCounterInterment);
-        GameManager.Instance.moveCounter.Add(randomValue);
+        GameManager.Inst.moveCounter.Add(randomValue);
     }
         
     private void OnDestroy()

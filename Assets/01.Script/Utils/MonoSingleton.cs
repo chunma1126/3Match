@@ -8,7 +8,7 @@ public class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T>
     private static bool HasDontDestroyAttribute =>
         typeof(T).GetCustomAttributes(typeof(DontDestroyOnLoadAttribute), true).Length > 0;
 
-    public static T Instance
+    public static T Inst
     {
         get
         {

@@ -5,8 +5,8 @@ public class HomeButton : SceneTransitionButton
     {
         base.Click();
         
-        GameManager.Instance.SaveScore();
-        GameManager.Instance.InitScore();
+        GameManager.Inst.SaveScore();
+        GameManager.Inst.InitScore();
     }
         
 }

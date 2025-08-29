@@ -16,7 +16,7 @@ public class SceneTransitionButton : Button
         if(clicked)return;
         
         clicked = true;
-        AudioManager.Instance.PlayBGM(bgm,duration);
+        AudioManager.Inst.PlayBGM(bgm,duration);
         TransitionManager.Instance.LoadLevel(sceneName);
     }
         
