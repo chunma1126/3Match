@@ -47,11 +47,14 @@ public class AudioManager : MonoSingleton<AudioManager>
     
     public void PlayBGM(AudioSO bgm,float duration)
     {
+#if UNITY_EDITOR
+        if (bgm == null) return;
+#endif
+        
         bgmSource.clip = bgm.GetAudioClip();
         bgmSource.loop = bgm.GetLoop();
         bgmSource.outputAudioMixerGroup = bgm.GetAudioMixerGroup();
         bgmSource.volume = 0;
-        
         bgmSource.Play();
         
         DOVirtual.Float(bgmSource.volume ,bgm.GetVolume() ,duration , x =>

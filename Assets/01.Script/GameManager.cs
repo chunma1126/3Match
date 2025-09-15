@@ -7,11 +7,9 @@ public class GameManager : MonoSingleton<GameManager>
     public const string MAX_SCORE_SAVE_KEY = "MaxScore";
     
     [SerializeField] private float defaultMoveCount = 5;
-    [SerializeField] private float defaultBombCount = 5;
     
     public Counter moveCounter;
     public Counter scoreCounter;
-    public Counter bombCounter;
 
     private float maxScore = 0;
     
@@ -21,10 +19,9 @@ public class GameManager : MonoSingleton<GameManager>
 
         moveCounter = new Counter();
         scoreCounter  = new Counter();
-        bombCounter = new Counter();
+       
         
         maxScore = PlayerPrefs.GetInt(GameManager.MAX_SCORE_SAVE_KEY);
-        bombCounter.Add(defaultBombCount);
         
         Application.targetFrameRate = 60;
     }

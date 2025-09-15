@@ -234,9 +234,6 @@ if (Input.touchCount > 0)
             
         GameManager.Inst.AddScore(25 * itemQueue.Count);
         
-        if(itemQueue.Count > 3)
-            GameManager.Inst.bombCounter.Add(1);
-        
         AudioManager.Inst.PlaySound(matchSound);
         lastMatchTime = Time.time;
         

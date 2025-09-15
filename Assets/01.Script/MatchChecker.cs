@@ -7,6 +7,7 @@ public class MatchChecker
     private readonly Vector2Int boardSize;
 
     private const int MATCH_MIN_SIZE = 3;
+    private const int SQUARE_SIZE = 4;
     
     public MatchChecker(Vector2Int boardSize,Tile[] tiles)
     {
@@ -37,7 +38,13 @@ public class MatchChecker
         bool checkVertical1 = CheckVertical(currentFruitIndex,ref queue);
         bool checkVertical2 = CheckVertical(lastFruitIndex, ref queue);
         
-        return checkHorizontal1 | checkHorizontal2 | checkVertical1 | checkVertical2;
+        bool checkSquare1 = CheckSquare(currentFruitIndex ,ref queue);
+        bool checkSquare2 = CheckSquare(lastFruitIndex ,ref queue);
+        
+        Debug.Log(checkSquare1);
+        Debug.Log(checkSquare2);
+        
+        return checkHorizontal1 | checkHorizontal2 | checkVertical1 | checkVertical2 | checkSquare1 | checkSquare2;
     }
 
     public UniqueQueue<int> FindHint()
@@ -114,7 +121,7 @@ public class MatchChecker
             int i1 = index - 2;
             int i2 = index - 1;
             int i3 = index;
-            IsTripleMatch(i1, i2, i3, ref queue);
+            TryMatch(i1, i2, i3, ref queue);
         }
         
         // center (x-1, x, x+1)
@@ -123,7 +130,7 @@ public class MatchChecker
             int i1 = index - 1;
             int i2 = index;
             int i3 = index + 1;
-            IsTripleMatch(i1, i2, i3, ref queue);
+            TryMatch(i1, i2, i3, ref queue);
         }
 
         // right (x, x+1, x+2)
@@ -132,7 +139,7 @@ public class MatchChecker
             int i1 = index;
             int i2 = index + 1;
             int i3 = index + 2;
-            IsTripleMatch(i1, i2, i3, ref queue);
+            TryMatch(i1, i2, i3, ref queue);
         }
         
         return queue.Count >= MATCH_MIN_SIZE;
@@ -154,7 +161,7 @@ public class MatchChecker
             int up1 = currentY - boardSize.x;
             int up2 = currentY -  boardSize.x * 2;
             
-            IsTripleMatch(currentY, up1, up2, ref queue);
+            TryMatch(currentY, up1, up2, ref queue);
         }
         
         //center
@@ -164,7 +171,7 @@ public class MatchChecker
             int up = currentX - boardSize.x;
             int down = currentX +  boardSize.x;
             
-            IsTripleMatch(currentX, up, down, ref queue);
+            TryMatch(currentX, up, down, ref queue);
         }
         
         //Right
@@ -174,12 +181,67 @@ public class MatchChecker
             int down = currentX +  boardSize.x;
             int down2 = currentX +  boardSize.x * 2;
 
-            IsTripleMatch(currentX, down, down2, ref queue);
+            TryMatch(currentX, down, down2, ref queue);
         }
         return queue.Count >= MATCH_MIN_SIZE;
     }
+
+    private bool CheckSquare(int index, ref UniqueQueue<int> queue)
+    {
+        if (tiles[index].CurrentItem.colorData.ColorType == ColorType.None)
+            return false;
+
+        int width = boardSize.x;
+        int height = boardSize.y;
+
+        int x = index % width;
+        int y = index / width;
+
+        // 왼쪽 위 기준
+        if (x + 1 < width && y + 1 < height)
+        {
+            int a = index;
+            int b = index + 1;
+            int c = index + width;
+            int d = index + width + 1;
+            TryMatch(a, b, c, d, ref queue);
+        }
+
+        // 오른쪽 위 기준
+        if (x - 1 >= 0 && y + 1 < height)
+        {
+            int a = index;
+            int b = index - 1;
+            int c = index + width;
+            int d = index + width - 1;
+            TryMatch(a, b, c, d, ref queue);
+        }
+
+        // 왼쪽 아래 기준
+        if (x + 1 < width && y - 1 >= 0)
+        {
+            int a = index;
+            int b = index + 1;
+            int c = index - width;
+            int d = index - width + 1;
+            TryMatch(a, b, c, d, ref queue);
+        }
+
+        // 오른쪽 아래 기준
+        if (x - 1 >= 0 && y - 1 >= 0)
+        {
+            int a = index;
+            int b = index - 1;
+            int c = index - width;
+            int d = index - width - 1;
+            TryMatch(a, b, c, d, ref queue);
+        }
+
+        return queue.Count >= SQUARE_SIZE;
+    }
+
     
-    private bool IsTripleMatch(int a, int b, int c, ref UniqueQueue<int> queue)
+    private bool TryMatch(int a, int b, int c, ref UniqueQueue<int> queue)
     {
         int maxWidth = tiles.Length;
         if (a < 0 || b < 0 || c < 0 || a >= maxWidth || b >= maxWidth || c >= maxWidth)
@@ -200,5 +262,29 @@ public class MatchChecker
         
         return isMatch;
     }
+    
+    private bool TryMatch(int a, int b, int c, int d, ref UniqueQueue<int> queue)
+    {
+        int maxWidth = tiles.Length;
+        if (a < 0 || b < 0 || c < 0 || d < 0 ||a >= maxWidth || b >= maxWidth || c >= maxWidth || d >= maxWidth)
+            return false;
         
+        var typeA = tiles[a].CurrentItem.colorData.ColorType;
+        var typeB = tiles[b].CurrentItem.colorData.ColorType;
+        var typeC = tiles[c].CurrentItem.colorData.ColorType;
+        var typeD = tiles[d].CurrentItem.colorData.ColorType;
+        
+        bool isMatch = (typeA == typeB) && (typeA == typeC) && (typeA == typeD);
+        
+        if (isMatch)
+        {
+            queue.Enqueue(a);
+            queue.Enqueue(b);
+            queue.Enqueue(c);
+            queue.Enqueue(d);
+        }
+        
+        return isMatch;
+    }
+    
 }

@@ -127,6 +127,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 623228312173334107, guid: 10816f4af4882ec4fa5cbc0d712976a7, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 2024334085523539040, guid: 10816f4af4882ec4fa5cbc0d712976a7, type: 3}
+      propertyPath: bombCountText
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 2055315814479373427, guid: 10816f4af4882ec4fa5cbc0d712976a7, type: 3}
       propertyPath: m_Pivot.x
       value: 0
