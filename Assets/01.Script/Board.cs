@@ -188,12 +188,6 @@ if (Input.touchCount > 0)
             {
                 GameManager.Inst.moveCounter.Add(-1);
                 
-                var copy = new List<int>(itemQueue);
-                foreach (var item in copy )
-                {
-                    TryUseItem(item);
-                }
-                
                 Match();
             }
             else
@@ -228,7 +222,7 @@ if (Input.touchCount > 0)
         
         return sequence;
     }
-        
+    
     private void Match()
     {
         if (itemQueue.Count <= 0)
@@ -236,6 +230,12 @@ if (Input.touchCount > 0)
             canInput = true;
             //Debug.Log("item queue is empty");
             return;
+        }
+        
+        var copy = new List<int>(itemQueue);
+        foreach (var item in copy)
+        {
+            TryUseItem(item);
         }
         
         TryCreateMatchItem();
@@ -343,6 +343,8 @@ if (Input.touchCount > 0)
         
         if (item.itemType == ItemType.Row)
         {
+            Debug.Log(index);
+            
             usingItem = true;
             
             int x = index % boardSize.x; 
@@ -389,19 +391,7 @@ if (Input.touchCount > 0)
         return index != -1 && tiles[index].CurrentItem?.itemType == ItemType.Normal;
     }
     #endregion
-    
-    [ContextMenu("ReRoll Board")]
-    public void ReRollBoard()
-    {
-        canInput = false;
-        itemController.ReRollItem().OnComplete(()=>
-        {
-            ResetIndex();
-            CheckAllTiles();
-        });
         
-    }
-    
     #region Hint
     private void ShowHint()
     {
@@ -430,5 +420,17 @@ if (Input.touchCount > 0)
         hintQueue.Clear();
     }
     #endregion
+    
+    [ContextMenu("ReRoll Board")]
+    public void ReRollBoard()
+    {
+        canInput = false;
+        itemController.ReRollItem().OnComplete(()=>
+        {
+            ResetIndex();
+            CheckAllTiles();
+        });
+        
+    }
     
 }

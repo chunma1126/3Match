@@ -103,9 +103,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d8005f1066590445b5acecba74b8489, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itemType: 0
   itemSprite: {fileID: 8667738423319941500, guid: 25fadaca3d7a3034d804f3b60cf61dd9, type: 3}
   colorData:
     ColorType: 0
     Color: {r: 0, g: 0, b: 0, a: 0}
-  scaleSize: 1.54
-  scaleDuration: 0.24
+  scaleSize: 1.55
+  scaleDuration: 0.35
