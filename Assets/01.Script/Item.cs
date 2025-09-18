@@ -2,8 +2,19 @@ using System;
 using DG.Tweening;
 using UnityEngine;
 
+
+public enum ItemType
+{
+    Normal = 0,
+    Row,
+    Column
+}
+
+
 public class Item : MonoBehaviour
 {
+    public ItemType itemType = ItemType.Normal;
+    
     public Sprite itemSprite;
     public ColorData colorData;
     
@@ -13,30 +24,45 @@ public class Item : MonoBehaviour
     
     private SpriteRenderer spriteRenderer;
     private Vector3 originalScale;
+
+    private Material material;
     
-    private void Awake()
+    private const string ColorKey = "_Color";
+    private const string ShinyColorKey = "_ShinyColor";
+    private const string ActiveKey = "_Active";
+    
+    protected virtual void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        material = spriteRenderer.material;
+        
         originalScale = transform.localScale;
     }
 
-    private void Start()
+    protected virtual void Start()
     {
         spriteRenderer.sprite = itemSprite;
     }
+    
+    public SpriteRenderer GetSpriteRenderer() => spriteRenderer;
     
     public Tween SetData(ColorData data)
     {
         colorData = data;
         gameObject.name = data.ColorType.ToString();
-    
+        
         Sequence sequence = DOTween.Sequence();
-    
+        
         if (data.ColorType == ColorType.None)
         {
+            itemType = ItemType.Normal;
+            
             sequence.Append(transform.DOScale(scaleSize, scaleDuration)).SetLink(gameObject);
             sequence.Append(transform.DOScale(0f, scaleDuration)).SetLink(gameObject);
-            sequence.AppendCallback(() => spriteRenderer.color = Color.clear).SetLink(gameObject);
+            sequence.AppendCallback(() =>
+            {
+                ActivateShinyMaterial(false);
+            }).SetLink(gameObject);
         }
         else
         {
@@ -44,15 +70,35 @@ public class Item : MonoBehaviour
             sequence.JoinCallback(() =>
             {
                 var color = data.Color;
-                spriteRenderer.color = new Color(color.r, color.g, color.b, 1);
+                material.SetColor(ColorKey, color);
             }).SetLink(gameObject);
             
         }
         
         return sequence;
     }
-
+        
+    public void SetItemType(ItemType itemType)
+    {
+        this.itemType = itemType;
+        
+        ActivateShinyMaterial(true);
+    }
     
-    public SpriteRenderer GetSpriteRenderer() => spriteRenderer;
+    private void ActivateShinyMaterial(bool active)
+    {
+        if (active)
+        {
+            material.SetColor(ColorKey, colorData.Color);
+            material.SetColor(ShinyColorKey , colorData.Color);
+            material.SetFloat(ActiveKey, 1);
+        }
+        else
+        {
+            material.SetColor(ShinyColorKey , Color.clear);
+            material.SetColor(ColorKey, Color.clear);
+            material.SetFloat(ActiveKey, 0);
+        }
+    }
     
 }

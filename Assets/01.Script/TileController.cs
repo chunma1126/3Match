@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using DG.Tweening;
 using UnityEngine;
 
@@ -22,7 +23,7 @@ public class TileController : MonoBehaviour
     {
         this.boardSize = boardSize;
     }
-    
+            
     public void CreateTiles(Vector2 startPos)
     {
         tiles = new Tile[boardSize.x * boardSize.y];
@@ -76,15 +77,13 @@ public class TileController : MonoBehaviour
     {
         ColorData colorData = new ColorData();
         colorData.ColorType = ColorType.None;
-           
+        
         return tiles[index].CurrentItem.SetData(colorData);
     }
-        
+    
     private Vector2Int IndexToPosition(int index)
     {
         return new Vector2Int(index % boardSize.x, index / boardSize.x);
     }
-    
-    
     
 }

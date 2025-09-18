@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Linq;
 using DG.Tweening;
 using System;
+using System.Collections.Generic;
 
 public class Board : MonoBehaviour
 {
@@ -16,9 +17,6 @@ public class Board : MonoBehaviour
     [Header("Sound info")]
     [SerializeField] private AudioClipSO matchSound;
         
-    public int GetBoardWidthSize => boardSize.x;
-    public int GetBoardHeightSize => boardSize.y;
-    
     private ItemController itemController;
     private TileController tileController;
       
@@ -33,7 +31,8 @@ public class Board : MonoBehaviour
     private const float SWAP_DURATION = 0.23f;
     
     private Vector3 currentMousePosition;
-        
+    private bool usingItem = false;
+    
     private void Awake()
     {
         itemController = GetComponent<ItemController>();
@@ -54,7 +53,7 @@ public class Board : MonoBehaviour
     {
         itemController.CreateItem().OnComplete(() =>
         {
-            bool hasNoMatch = matchChecker.FindHint().Count <= 0;
+            bool hasNoMatch = matchChecker.FindMatch().Count <= 0;
         
             if (hasNoMatch)
             {
@@ -188,6 +187,13 @@ if (Input.touchCount > 0)
             if (match)
             {
                 GameManager.Inst.moveCounter.Add(-1);
+                
+                var copy = new List<int>(itemQueue);
+                foreach (var item in copy )
+                {
+                    TryUseItem(item);
+                }
+                
                 Match();
             }
             else
@@ -231,9 +237,10 @@ if (Input.touchCount > 0)
             //Debug.Log("item queue is empty");
             return;
         }
-            
-        GameManager.Inst.AddScore(25 * itemQueue.Count);
         
+        TryCreateMatchItem();
+        
+        GameManager.Inst.AddScore(25 * itemQueue.Count);
         AudioManager.Inst.PlaySound(matchSound);
         lastMatchTime = Time.time;
         
@@ -245,7 +252,7 @@ if (Input.touchCount > 0)
         {
             int index = itemQueue.Dequeue();
             tileController.RemoveItem(index);
-            itemQueue.Enqueue(index); 
+            itemQueue.Enqueue(index);
         }
         
         int lastIndex = itemQueue.Dequeue();
@@ -254,12 +261,11 @@ if (Input.touchCount > 0)
         tileController.RemoveItem(lastIndex).OnComplete(() =>
         {
             var queue = new UniqueQueue<int>(itemQueue);
-                        
+            
             itemQueue.Clear(); 
             int total = queue.Count;
             int completed = 0;
-            
-                        
+                                    
             foreach (int index in queue)
             {
                 ApplyGravity(index, ()=>
@@ -272,10 +278,9 @@ if (Input.touchCount > 0)
         
     }
     
-        
     private void ApplyGravity(int index,Action callback = null)
     {
-        int aboveIndex = index - GetBoardWidthSize;
+        int aboveIndex = index - boardSize.x;
         
         if (aboveIndex < 0)
         {
@@ -294,10 +299,12 @@ if (Input.touchCount > 0)
         ++completed;
         if (completed >= total)
         {
+            usingItem = false;
+            
             completed = 0;
             itemController.RefillItem().OnComplete(() =>
             {
-                bool hasNoMatch = matchChecker.FindHint().Count <= 0;
+                bool hasNoMatch = matchChecker.FindMatch().Count <= 0;
                 
                 if (hasNoMatch)
                 {
@@ -327,6 +334,62 @@ if (Input.touchCount > 0)
         selectSecondIndex = -1;
     }
     
+    #region Item
+    private void TryUseItem(int index)
+    {
+        var item = tileController.Tiles[index].CurrentItem;
+        if (item.itemType == ItemType.Normal)
+            return;
+        
+        if (item.itemType == ItemType.Row)
+        {
+            usingItem = true;
+            
+            int x = index % boardSize.x; 
+                        
+            for (int y = 0; y < boardSize.y; y++)
+            {
+                int idx = x + y * boardSize.x;
+                itemQueue.Enqueue(idx);
+            }
+        }
+        
+    }
+    private void TryCreateMatchItem()
+    {
+        if (usingItem || itemQueue.Count <= 3)
+            return;
+        
+        var tiles = tileController.Tiles;
+
+        //Debug.Log($"firstIndex: {selectFirstIndex}, secondIndex: {selectSecondIndex}, peekIndex: {itemQueue.Peek()}");
+        
+        int targetIndex = GetTargetIndex(tiles);
+        if (targetIndex == -1)
+            return;
+
+        tiles[targetIndex].CurrentItem.SetItemType(ItemType.Row);
+    }
+    private int GetTargetIndex(Tile[] tiles)
+    {
+        if (IsNormalItem(tiles, selectFirstIndex) && itemQueue.TryRemove(selectFirstIndex))
+            return selectFirstIndex;
+        
+        if (IsNormalItem(tiles, selectSecondIndex) && itemQueue.TryRemove(selectSecondIndex))
+            return selectSecondIndex;
+
+        int peekIndex = itemQueue.Peek();
+        if (IsNormalItem(tiles, peekIndex))
+            return peekIndex;
+
+        return -1;
+    }
+    private bool IsNormalItem(Tile[] tiles, int index)
+    {
+        return index != -1 && tiles[index].CurrentItem?.itemType == ItemType.Normal;
+    }
+    #endregion
+    
     [ContextMenu("ReRoll Board")]
     public void ReRollBoard()
     {
@@ -344,7 +407,7 @@ if (Input.touchCount > 0)
     {
         isShowHint = true;
         
-        hintQueue = matchChecker.FindHint();
+        hintQueue = matchChecker.FindMatch();
         foreach (var item in hintQueue)
         {
             Tile tile = tileController.Tiles[item];

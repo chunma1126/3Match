@@ -411,7 +411,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 1
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -470,7 +470,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scoreText: {fileID: 3562756034401356826}
   moveCountText: {fileID: 3571154365089065770}
-  bombCountText: {fileID: 0}
 --- !u!1 &7937886695867818439
 GameObject:
   m_ObjectHideFlags: 0

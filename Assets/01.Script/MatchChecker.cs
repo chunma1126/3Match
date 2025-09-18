@@ -24,7 +24,7 @@ public class MatchChecker
                 int index = y * boardSize.x + x;
                 CheckHorizontal(index, ref queue);
                 CheckVertical(index, ref queue);
-                
+                CheckSquare(index, ref queue);
             }
         }
         
@@ -41,16 +41,13 @@ public class MatchChecker
         bool checkSquare1 = CheckSquare(currentFruitIndex ,ref queue);
         bool checkSquare2 = CheckSquare(lastFruitIndex ,ref queue);
         
-        Debug.Log(checkSquare1);
-        Debug.Log(checkSquare2);
-        
         return checkHorizontal1 | checkHorizontal2 | checkVertical1 | checkVertical2 | checkSquare1 | checkSquare2;
     }
 
-    public UniqueQueue<int> FindHint()
+    public UniqueQueue<int> FindMatch()
     {
         UniqueQueue<int> hintQueue = new UniqueQueue<int>();
-
+        
         for (int y = 0; y < boardSize.y; y++)
         {
             for (int x = 0; x < boardSize.x; x++)
@@ -65,9 +62,11 @@ public class MatchChecker
                     UniqueQueue<int> tempQueue = new UniqueQueue<int>();
                     bool hasMatch = CheckHorizontal(index, ref tempQueue) || 
                                    CheckVertical(index, ref tempQueue) ||
+                                   CheckSquare(index , ref tempQueue) || 
                                    CheckHorizontal(right, ref tempQueue) || 
-                                   CheckVertical(right, ref tempQueue);
-
+                                   CheckVertical(right, ref tempQueue) ||
+                                   CheckSquare(right , ref tempQueue);
+                    
                     if (hasMatch)
                     {
                         hintQueue.Enqueue(index);
@@ -86,11 +85,13 @@ public class MatchChecker
                     (tiles[index], tiles[down]) = (tiles[down], tiles[index]);
 
                     UniqueQueue<int> tempQueue = new UniqueQueue<int>();
-                    bool hasMatch = CheckHorizontal(index, ref tempQueue) || 
+                     bool hasMatch = CheckHorizontal(index, ref tempQueue) || 
                                    CheckVertical(index, ref tempQueue) ||
-                                   CheckHorizontal(down, ref tempQueue) || 
-                                   CheckVertical(down, ref tempQueue);
-
+                                   CheckSquare(index , ref tempQueue) || 
+                                   CheckHorizontal(down ,ref tempQueue) || 
+                                   CheckVertical(down, ref tempQueue) ||
+                                   CheckSquare(down , ref tempQueue);
+                    
                     if (hasMatch)
                     {
                         hintQueue.Enqueue(index);
@@ -197,7 +198,7 @@ public class MatchChecker
         int x = index % width;
         int y = index / width;
 
-        // 왼쪽 위 기준
+        // left ups
         if (x + 1 < width && y + 1 < height)
         {
             int a = index;
@@ -207,7 +208,7 @@ public class MatchChecker
             TryMatch(a, b, c, d, ref queue);
         }
 
-        // 오른쪽 위 기준
+        // right up
         if (x - 1 >= 0 && y + 1 < height)
         {
             int a = index;
@@ -217,7 +218,7 @@ public class MatchChecker
             TryMatch(a, b, c, d, ref queue);
         }
 
-        // 왼쪽 아래 기준
+        // left down
         if (x + 1 < width && y - 1 >= 0)
         {
             int a = index;
@@ -226,8 +227,8 @@ public class MatchChecker
             int d = index - width + 1;
             TryMatch(a, b, c, d, ref queue);
         }
-
-        // 오른쪽 아래 기준
+        
+        // right down
         if (x - 1 >= 0 && y - 1 >= 0)
         {
             int a = index;
@@ -236,10 +237,9 @@ public class MatchChecker
             int d = index - width - 1;
             TryMatch(a, b, c, d, ref queue);
         }
-
+        
         return queue.Count >= SQUARE_SIZE;
     }
-
     
     private bool TryMatch(int a, int b, int c, ref UniqueQueue<int> queue)
     {

@@ -995,7 +995,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4469661297253915891, guid: 955b3ac07fb87cd4b9f837f12785559a, type: 3}
       propertyPath: defaultMoveCount
-      value: 400
+      value: 75
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
