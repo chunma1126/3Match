@@ -7,7 +7,9 @@ public enum ItemType
 {
     Normal = 0,
     Row,
-    Column
+    Column,
+    Square,
+    Five
 }
 
 

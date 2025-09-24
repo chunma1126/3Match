@@ -6,12 +6,13 @@ public class GameManager : MonoSingleton<GameManager>
 {
     public const string MAX_SCORE_SAVE_KEY = "MaxScore";
     
-    [SerializeField] private float defaultMoveCount = 5;
+    [SerializeField] private float defaultMoveCount = 50;
     
     public Counter moveCounter;
     public Counter scoreCounter;
 
     private float maxScore = 0;
+    public bool HasMoveCount => moveCounter.Value > 0;
     
     protected override void Awake()
     {
@@ -33,16 +34,16 @@ public class GameManager : MonoSingleton<GameManager>
     
     private void OnDestroy()
     {
+        moveCounter.ClearOnChangeValue();
+        scoreCounter.ClearOnChangeValue();
     }
-    
-    public bool HasMoveCount => moveCounter.Value > 0;
     
     #region Score
     public void InitScore()
     {
         scoreCounter.Add(-scoreCounter.Value);
     }
-
+    
     public void SaveScore()
     {
         PlayerPrefs.SetInt(MAX_SCORE_SAVE_KEY, (int)maxScore);

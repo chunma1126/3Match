@@ -108,7 +108,7 @@ public class MatchChecker
         
         return hintQueue;
     }
-    
+        
     private bool CheckHorizontal(int index , ref UniqueQueue<int> queue)
     {
         if (tiles[index].CurrentItem.colorData.ColorType == ColorType.None) return false;
@@ -286,5 +286,5 @@ public class MatchChecker
         
         return isMatch;
     }
-    
+        
 }

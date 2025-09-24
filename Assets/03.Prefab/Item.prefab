@@ -108,5 +108,5 @@ MonoBehaviour:
   colorData:
     ColorType: 0
     Color: {r: 0, g: 0, b: 0, a: 0}
-  scaleSize: 1.55
-  scaleDuration: 0.35
+  scaleSize: 1.68
+  scaleDuration: 0.362

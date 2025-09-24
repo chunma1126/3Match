@@ -1,13 +1,17 @@
+using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using DG.Tweening;
 using System;
-using System.Collections.Generic;
+using Random = UnityEngine.Random;
 
 public class Board : MonoBehaviour
 {
     [SerializeField] private Vector2 startPos = new Vector2(-2,2);
     [SerializeField] private Vector2Int boardSize;
+    
+    [Range(0,1)][SerializeField] private float swapDuration = 0.23f;
+    [SerializeField] private ItemEffect itemEffect;
     
     [Header("Hint info")]
     [SerializeField] private float hintShowTime = 5.0f;
@@ -19,20 +23,16 @@ public class Board : MonoBehaviour
         
     private ItemController itemController;
     private TileController tileController;
-      
-    private bool canInput = true;
-    private int selectFirstIndex = -1;
-    private int selectSecondIndex = -1;
-        
+    private BoardInput input;
+    private ItemHandler itemHandler;
+    
     private MatchChecker matchChecker;
     private UniqueQueue<int> itemQueue;
     private UniqueQueue<int> hintQueue;
-      
-    private const float SWAP_DURATION = 0.23f;
     
-    private Vector3 currentMousePosition;
-    private bool usingItem = false;
-    
+  
+    private const float REROLL_TIME = 0.8f;
+        
     private void Awake()
     {
         itemController = GetComponent<ItemController>();
@@ -42,8 +42,11 @@ public class Board : MonoBehaviour
         tileController.CreateTiles(startPos);
         
         itemController.Init(tileController.Tiles);
+        
         matchChecker = new MatchChecker(boardSize,tileController.Tiles);
-                
+        input = new  BoardInput(tileController);
+        itemHandler = new ItemHandler(tileController , input , boardSize);
+        
         hintQueue = new UniqueQueue<int>(10);
         itemQueue = new UniqueQueue<int>(10);
         lastMatchTime = hintShowTime;
@@ -64,7 +67,7 @@ public class Board : MonoBehaviour
                 CheckAllTiles();
             }
             
-            canInput = true;        
+            input.CanInput = true;        
         });
                 
     }
@@ -79,88 +82,30 @@ public class Board : MonoBehaviour
         {
             HideHint();
         }
-        
-        if(canInput)
-            SwapProcess();
+
+        if (input.CanInput)
+        {
+            input.Update();
+
+            if (input.HasValue)
+            {
+                SwapProcess();
+            }
+            
+        }
     }
     
     private void SwapProcess()
     {
-#if UNITY_EDITOR || UNITY_STANDALONE
-        
-        if (Input.GetMouseButtonDown(0))
-        {
-            currentMousePosition = Utility.GetMouseWorldPosition();
-            Tile currentTile = tileController.FindTile(currentMousePosition);
-            int currentIndex = Array.IndexOf(tileController.TilesPositions, currentTile.transform.position);
-    
-            selectFirstIndex = currentIndex;
-        }
-
-        if (Input.GetMouseButton(0))
-        {
-            Vector3 newMousePosition = Utility.GetMouseWorldPosition();
-            if (Vector3.Distance(currentMousePosition, newMousePosition) > 0.1f) 
-            {
-                Tile currentTile = tileController.FindTile(newMousePosition); 
-                if (currentTile != null)
-                {
-                    int currentIndex = Array.IndexOf(tileController.TilesPositions, currentTile.transform.position);
-                    if(selectFirstIndex != currentIndex)
-                        selectSecondIndex = currentIndex;
-                }
-            }
-        }
-
-        if (Input.GetMouseButtonUp(0))
-        {
-            ResetIndex();
-        }
-        
-#elif UNITY_ANDROID
-if (Input.touchCount > 0)
-{
-    Touch touch = Input.GetTouch(0);
-
-    if (touch.phase == TouchPhase.Began)
-    {
-        Vector3 touchWorldPos = Utility.GetTouchWorldPosition(touch.position);
-        Tile currentTile = tileController.FindTile(touchWorldPos);
-        int currentIndex = Array.IndexOf(tileController.TilesPositions, currentTile.transform.position);
-        
-        selectFirstIndex = currentIndex;
-        currentMousePosition = touchWorldPos; // 시작 터치 위치 저장
-    }
-    
-    if (touch.phase == TouchPhase.Moved)
-    {
-        Vector3 currentTouchPos = Utility.GetTouchWorldPosition(touch.position);
-        if (Vector3.Distance(currentMousePosition, currentTouchPos) > 0.1f)
-        {
-            Tile currentTile = tileController.FindTile(currentTouchPos);
-            if (currentTile != null)
-            {
-                int currentIndex = Array.IndexOf(tileController.TilesPositions, currentTile.transform.position);
-                if(selectFirstIndex != currentIndex)
-                    selectSecondIndex = currentIndex;
-            }
-        }
-    }
-    
-    if (touch.phase == TouchPhase.Ended)
-    {
-        ResetIndex();
-    }
-}
-#endif
-                
-        bool isAdjustment = tileController.IsAdjacent(selectFirstIndex , selectSecondIndex);
-        bool isTileHashFruit = tileController.HasVailedItem(selectFirstIndex , selectSecondIndex);
+        bool isAdjustment = input.IsAdjustment();
+        bool isTileHashFruit = input.HasVailedItem();
         bool canSwap = (isTileHashFruit && isAdjustment);
+        
+        //Debug.Log($"isAdjustment : {isAdjustment}, isTileHashFruit : {isTileHashFruit}, canSwap : {canSwap}");
         
         if (canSwap)
         {
-            canInput = false;
+            input.CanInput = false;
             
             TrySwap();
         }
@@ -169,21 +114,21 @@ if (Input.touchCount > 0)
         
     private void TrySwap()
     {
-        if (selectFirstIndex == -1 || selectSecondIndex == -1 || !GameManager.Inst.HasMoveCount)
+        if (!input.HasValue || !GameManager.Inst.HasMoveCount)
         {
             if (!GameManager.Inst.HasMoveCount)
             {
                 PopupManager.Inst.PopUp(PopupType.Add);
             }
             
-            canInput = true;
-            ResetIndex();
+            input.CanInput = true;
+            input.ResetIndex();
             return;
         }
         
-        Swap(selectFirstIndex, selectSecondIndex).OnComplete(() =>
+        Swap(input.SelectFirstIndex, input.SelectSecondIndex).OnComplete(() =>
         {
-            bool match = matchChecker.IsMatch(selectFirstIndex, selectSecondIndex, ref itemQueue);
+            bool match = matchChecker.IsMatch(input.SelectFirstIndex, input.SelectSecondIndex, ref itemQueue);
             if (match)
             {
                 GameManager.Inst.moveCounter.Add(-1);
@@ -193,10 +138,10 @@ if (Input.touchCount > 0)
             else
             {
                 //swap undo
-                Swap(selectFirstIndex, selectSecondIndex).OnComplete(() =>
+                Swap(input.SelectFirstIndex, input.SelectSecondIndex).OnComplete(() =>
                 {
-                    ResetIndex();
-                    canInput = true;
+                    input.ResetIndex();
+                    input.CanInput = true;
                 });
             }
         });
@@ -205,7 +150,7 @@ if (Input.touchCount > 0)
     
     private Tween Swap(int currentIndex,int lastIndex)
     {
-        canInput = false;
+        input.CanInput = false;
         
         Tile tileA = tileController.Tiles[currentIndex];
         Tile tileB = tileController.Tiles[lastIndex];
@@ -217,8 +162,8 @@ if (Input.touchCount > 0)
         tileB.CurrentItem = itemA;
         
         Sequence sequence = DOTween.Sequence();
-        sequence.Append(itemA.transform.DOLocalMove(Vector3.zero, SWAP_DURATION).SetLink(itemA.gameObject));
-        sequence.Join(itemB.transform.DOLocalMove(Vector3.zero, SWAP_DURATION).SetLink(itemB.gameObject));
+        sequence.Append(itemA.transform.DOLocalMove(Vector3.zero, swapDuration).SetLink(itemA.gameObject));
+        sequence.Join(itemB.transform.DOLocalMove(Vector3.zero, swapDuration).SetLink(itemB.gameObject));
         
         return sequence;
     }
@@ -227,7 +172,7 @@ if (Input.touchCount > 0)
     {
         if (itemQueue.Count <= 0)
         {
-            canInput = true;
+            input.CanInput = true;
             //Debug.Log("item queue is empty");
             return;
         }
@@ -235,10 +180,11 @@ if (Input.touchCount > 0)
         var copy = new List<int>(itemQueue);
         foreach (var item in copy)
         {
-            TryUseItem(item);
+            itemHandler.TryUseItem(item,itemQueue , CreateItemEffect);
         }
         
-        TryCreateMatchItem();
+        if(itemQueue.Count > 3 && IsAllSameColor(itemQueue))
+            itemHandler.TryCreateMatchItem(itemQueue);
         
         GameManager.Inst.AddScore(25 * itemQueue.Count);
         AudioManager.Inst.PlaySound(matchSound);
@@ -263,6 +209,7 @@ if (Input.touchCount > 0)
             var queue = new UniqueQueue<int>(itemQueue);
             
             itemQueue.Clear(); 
+            
             int total = queue.Count;
             int completed = 0;
                                     
@@ -276,6 +223,15 @@ if (Input.touchCount > 0)
             
         });
         
+    }
+
+    private void CreateItemEffect(Vector3 position, Vector2 dir)
+    {
+        ItemEffect obj = Instantiate(itemEffect, position,Quaternion.identity);
+        obj.SetDirection(dir);
+        
+        //to do : change to pool
+        Destroy(obj, 3f);
     }
     
     private void ApplyGravity(int index,Action callback = null)
@@ -299,24 +255,24 @@ if (Input.touchCount > 0)
         ++completed;
         if (completed >= total)
         {
-            usingItem = false;
+            itemHandler.UsingItem = false;
             
             completed = 0;
             itemController.RefillItem().OnComplete(() =>
             {
                 bool hasNoMatch = matchChecker.FindMatch().Count <= 0;
-                
+              
                 if (hasNoMatch)
                 {
-                    Invoke(nameof(ReRollBoard) , 2f);
+                    Invoke(nameof(ReRollBoard) , REROLL_TIME);
                 }
                 else
                 {
                     CheckAllTiles();
-                    ResetIndex();
+                    input.ResetIndex();
                 }
             });
-                        
+            
         }
         
         return completed;
@@ -327,70 +283,28 @@ if (Input.touchCount > 0)
         matchChecker.CheckAllTiles(ref itemQueue);
         Match();
     }
-    
-    private void ResetIndex()
-    {
-        selectFirstIndex = -1;
-        selectSecondIndex = -1;
-    }
-    
-    #region Item
-    private void TryUseItem(int index)
-    {
-        var item = tileController.Tiles[index].CurrentItem;
-        if (item.itemType == ItemType.Normal)
-            return;
         
-        if (item.itemType == ItemType.Row)
+    private bool IsAllSameColor(UniqueQueue<int> queue)
+    {
+        if (queue.Count == 0)
+            return false; 
+        
+        UniqueQueue<int> q = new UniqueQueue<int>(queue);
+
+        int firstIndex = q.Dequeue();
+        ColorData firstColor = tileController.Tiles[firstIndex].CurrentItem.colorData;
+        
+        while (q.Count > 0)
         {
-            Debug.Log(index);
-            
-            usingItem = true;
-            
-            int x = index % boardSize.x; 
-                        
-            for (int y = 0; y < boardSize.y; y++)
-            {
-                int idx = x + y * boardSize.x;
-                itemQueue.Enqueue(idx);
-            }
+            int idx = q.Dequeue();
+            if (tileController.Tiles[idx].CurrentItem.colorData.NotEquals(firstColor))
+                return false; 
         }
         
+        return true; 
     }
-    private void TryCreateMatchItem()
-    {
-        if (usingItem || itemQueue.Count <= 3)
-            return;
-        
-        var tiles = tileController.Tiles;
-
-        //Debug.Log($"firstIndex: {selectFirstIndex}, secondIndex: {selectSecondIndex}, peekIndex: {itemQueue.Peek()}");
-        
-        int targetIndex = GetTargetIndex(tiles);
-        if (targetIndex == -1)
-            return;
-
-        tiles[targetIndex].CurrentItem.SetItemType(ItemType.Row);
-    }
-    private int GetTargetIndex(Tile[] tiles)
-    {
-        if (IsNormalItem(tiles, selectFirstIndex) && itemQueue.TryRemove(selectFirstIndex))
-            return selectFirstIndex;
-        
-        if (IsNormalItem(tiles, selectSecondIndex) && itemQueue.TryRemove(selectSecondIndex))
-            return selectSecondIndex;
-
-        int peekIndex = itemQueue.Peek();
-        if (IsNormalItem(tiles, peekIndex))
-            return peekIndex;
-
-        return -1;
-    }
-    private bool IsNormalItem(Tile[] tiles, int index)
-    {
-        return index != -1 && tiles[index].CurrentItem?.itemType == ItemType.Normal;
-    }
-    #endregion
+    
+    
         
     #region Hint
     private void ShowHint()
@@ -424,13 +338,12 @@ if (Input.touchCount > 0)
     [ContextMenu("ReRoll Board")]
     public void ReRollBoard()
     {
-        canInput = false;
+        input.CanInput = false;
         itemController.ReRollItem().OnComplete(()=>
         {
-            ResetIndex();
+            input.ResetIndex();
             CheckAllTiles();
         });
-        
     }
     
 }

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -15,10 +16,22 @@ public enum ColorType
 }
 
 [System.Serializable]
-public struct ColorData
+public struct ColorData : IEquatable<ColorData>
 {
     public ColorType ColorType;
     public Color Color;
+
+
+    public bool Equals(ColorData other)
+    {
+        return ColorType == other.ColorType;
+    }
+    
+    public bool NotEquals(ColorData other)
+    {
+        return ColorType != other.ColorType;
+    }
+    
 }
 
 [CreateAssetMenu(fileName = "ColorDataContainer", menuName = "SO/ColorDataContainer")]

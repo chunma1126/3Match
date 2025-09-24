@@ -14,5 +14,10 @@ public class Counter
         this.value += value;
         OnChangeValue?.Invoke(this.value);
     }
+
+    public void ClearOnChangeValue()
+    {
+        OnChangeValue = null;
+    }
     
 }

@@ -1,4 +1,3 @@
-using System;
 using DG.Tweening;
 using UnityEngine;
 
@@ -9,6 +8,8 @@ public class AudioManager : MonoSingleton<AudioManager>
     
     private GameObject bgmEmitter;
     private AudioSource bgmSource;
+
+    private const string AUDIO_EMITTER_NAME = "AudioEmitter";
     
     private void Start()
     {
@@ -21,28 +22,17 @@ public class AudioManager : MonoSingleton<AudioManager>
     
     public void PlaySound(AudioSO clip)
     {
-        GameObject audioEmitter = new GameObject("AudioEmitter");
+        GameObject audioEmitter = new GameObject(AUDIO_EMITTER_NAME);
         AudioSource source = audioEmitter.AddComponent<AudioSource>();
-
+        
         source.clip = clip.GetAudioClip();
         source.volume = clip.GetVolume();
-                
+        
         source.outputAudioMixerGroup = clip.GetAudioMixerGroup();
         
         source.PlayOneShot(clip.GetAudioClip());
         Destroy(audioEmitter, clip.GetAudioClip().length);
         
-        /*if (!clip.GetLoop())
-        {
-            source.PlayOneShot(clip.GetAudioClip());
-            Destroy(audioEmitter, clip.GetAudioClip().length);
-        }
-        else
-        {
-            source.loop = true;
-            source.clip = clip.GetAudioClip();
-            source.Play();
-        }*/
     }
     
     public void PlayBGM(AudioSO bgm,float duration)
