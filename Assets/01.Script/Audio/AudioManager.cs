@@ -1,23 +1,27 @@
+using System.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 [DontDestroyOnLoad]
 public class AudioManager : MonoSingleton<AudioManager>
 {
-    [SerializeField] private AudioSO titleBGM;
+    [SerializeField] private AssetReference titleBGM;
     
     private GameObject bgmEmitter;
     private AudioSource bgmSource;
-
+    
     private const string AUDIO_EMITTER_NAME = "AudioEmitter";
     
-    private void Start()
+    private async void Start()
     {
         bgmEmitter = new GameObject("BGMEmitter");
         bgmSource = bgmEmitter.AddComponent<AudioSource>();
         DontDestroyOnLoad(bgmEmitter);
         
-        PlayBGM(titleBGM,3.5f);
+        await Task.Yield(); 
+        var bgm = await AssetManager.LoadAsync<AudioSO>(titleBGM);
+        PlayBGM(bgm, 3.5f);
     }
     
     public void PlaySound(AudioSO clip)

@@ -1,13 +1,13 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 public class TileController : MonoBehaviour
 {
     [Header("Prefab info")]
-    [SerializeField] private Tile[] tilePrefabs;
-
+    [SerializeField] private AssetReferenceGameObject[] tilePrefabsRef;
+    
     public Tile[] Tiles => tiles;
     public Vector2[] TilesPositions => tilePositions;
         
@@ -24,17 +24,23 @@ public class TileController : MonoBehaviour
         this.boardSize = boardSize;
     }
             
-    public void CreateTiles(Vector2 startPos)
+    public async void CreateTiles(Vector2 startPos)
     {
         tiles = new Tile[boardSize.x * boardSize.y];
         tilePositions = new Vector2[boardSize.x * boardSize.y];
+        
+        GameObject[] tilePrefab = new GameObject[tilePrefabsRef.Length];
+        for (int i = 0; i < tilePrefab.Length; i++)
+        {
+            tilePrefab[i] = await AssetManager.LoadAsync<GameObject>(tilePrefabsRef[i]);
+        }
         
         for (int x = 0; x < boardSize.x; x++)
         {
             for (int y = 0; y < boardSize.y; y++)
             {
                 Vector2 pos = startPos + new Vector2(x * TILE_SIZE_WIDTH, -y * TILE_SIZE_HEIGHT);
-                Tile tile = Instantiate(tilePrefabs[(y + x) % 2], pos, Quaternion.identity);
+                Tile tile = Instantiate(tilePrefab[(y + x) % 2], pos, Quaternion.identity).GetComponent<Tile>();
                 tile.transform.SetParent(transform);
                 
                 tile.gameObject.name = $"Tile_{x}_{y}";

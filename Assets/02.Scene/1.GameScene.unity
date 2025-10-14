@@ -265,9 +265,19 @@ MonoBehaviour:
   startPos: {x: -2, y: 2}
   boardSize: {x: 5, y: 8}
   swapDuration: 0.167
-  itemEffect: {fileID: -445477283809290792, guid: 59daa54ab63f22d4290ae213b9b7e74e, type: 3}
+  itemEffect:
+    m_AssetGUID: 59daa54ab63f22d4290ae213b9b7e74e
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
   hintShowTime: 15
-  matchSound: {fileID: 11400000, guid: 9c158d7ad0038cb4eb17374f855edf95, type: 2}
+  matchSound:
+    m_AssetGUID: 9c158d7ad0038cb4eb17374f855edf95
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 1
 --- !u!114 &761541458
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -280,9 +290,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92f5af38633fd5b4f963d61991448ae8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelDataContainer: {fileID: 11400000, guid: 7e8186bff5ac9eb4ba4b430535e06c07, type: 2}
-  colorDataContainer: {fileID: 11400000, guid: da95eb4d7aa32984d9822174960d5c59, type: 2}
-  item: {fileID: 5655201470030585482, guid: 3db23b6151e5fef4bbacdf1d5136b20e, type: 3}
+  levelDataContainerRef:
+    m_AssetGUID: 7e8186bff5ac9eb4ba4b430535e06c07
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  colorDataContainer:
+    m_AssetGUID: da95eb4d7aa32984d9822174960d5c59
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  itemAssetReference:
+    m_AssetGUID: 3db23b6151e5fef4bbacdf1d5136b20e
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
 --- !u!114 &761541459
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -295,9 +320,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 010811ebfca24961b0d5ff00c6dfdbdd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tilePrefabs:
-  - {fileID: -7482560631186031102, guid: c3a65ef050773cf408c7c9f57d16b46f, type: 3}
-  - {fileID: 1404133526384461615, guid: 2f9d3bd02fe064f44ba5ece064b9213e, type: 3}
+  tilePrefabsRef:
+  - m_AssetGUID: c3a65ef050773cf408c7c9f57d16b46f
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  - m_AssetGUID: 2f9d3bd02fe064f44ba5ece064b9213e
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 1
 --- !u!1001 &1240401199
 PrefabInstance:
   m_ObjectHideFlags: 0

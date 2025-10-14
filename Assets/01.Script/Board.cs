@@ -3,7 +3,11 @@ using UnityEngine;
 using System.Linq;
 using DG.Tweening;
 using System;
-using Random = UnityEngine.Random;
+using System.Threading.Tasks;
+using UnityEngine.AddressableAssets;
+
+
+
 
 public class Board : MonoBehaviour
 {
@@ -11,7 +15,7 @@ public class Board : MonoBehaviour
     [SerializeField] private Vector2Int boardSize;
     
     [Range(0,1)][SerializeField] private float swapDuration = 0.23f;
-    [SerializeField] private ItemEffect itemEffect;
+    [SerializeField] private AssetReferenceGameObject itemEffect;
     
     [Header("Hint info")]
     [SerializeField] private float hintShowTime = 5.0f;
@@ -19,8 +23,8 @@ public class Board : MonoBehaviour
     private float lastMatchTime = 0;
     
     [Header("Sound info")]
-    [SerializeField] private AudioClipSO matchSound;
-        
+    [SerializeField] private AssetReferenceAudioSO matchSound;
+    
     private ItemController itemController;
     private TileController tileController;
     private BoardInput input;
@@ -52,23 +56,22 @@ public class Board : MonoBehaviour
         lastMatchTime = hintShowTime;
     }
     
-    private void Start()
+    private async void Start()
     {
-        itemController.CreateItem().OnComplete(() =>
-        {
-            bool hasNoMatch = matchChecker.FindMatch().Count <= 0;
+        await itemController.CreateItem(); 
         
-            if (hasNoMatch)
-            {
-                ReRollBoard();
-            }
-            else
-            {
-                CheckAllTiles();
-            }
+        bool hasNoMatch = matchChecker.FindMatch().Count <= 0;
+        
+        if (hasNoMatch)
+        {
+            ReRollBoard();
+        }
+        else
+        {
+            CheckAllTiles();
+        }
             
-            input.CanInput = true;        
-        });
+        input.CanInput = true;        
                 
     }
     
@@ -186,9 +189,7 @@ public class Board : MonoBehaviour
         if(itemQueue.Count > 3 && IsAllSameColor(itemQueue))
             itemHandler.TryCreateMatchItem(itemQueue);
         
-        GameManager.Inst.AddScore(25 * itemQueue.Count);
-        AudioManager.Inst.PlaySound(matchSound);
-        lastMatchTime = Time.time;
+        MatchProcess();
         
         // Swap must start from the minimum index
         itemQueue = new UniqueQueue<int>(itemQueue.OrderBy(i => i));
@@ -225,9 +226,19 @@ public class Board : MonoBehaviour
         
     }
 
-    private void CreateItemEffect(Vector3 position, Vector2 dir)
+    private async Task MatchProcess()
     {
-        ItemEffect obj = Instantiate(itemEffect, position,Quaternion.identity);
+        GameManager.Inst.AddScore(25 * itemQueue.Count);
+        
+        var mathSound = await AssetManager.LoadAsync<AudioSO>(matchSound);
+        AudioManager.Inst.PlaySound(mathSound);
+        
+        lastMatchTime = Time.time;
+    }
+
+    private async void CreateItemEffect(Vector3 position, Vector2 dir)
+    {
+        ItemEffect obj = await AssetManager.LoadAsync<ItemEffect>(itemEffect);
         obj.SetDirection(dir);
         
         //to do : change to pool
@@ -258,7 +269,7 @@ public class Board : MonoBehaviour
             itemHandler.UsingItem = false;
             
             completed = 0;
-            itemController.RefillItem().OnComplete(() =>
+            itemController.RefillItem().Result.OnComplete(() =>
             {
                 bool hasNoMatch = matchChecker.FindMatch().Count <= 0;
               

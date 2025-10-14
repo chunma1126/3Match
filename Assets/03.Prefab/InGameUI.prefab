@@ -348,7 +348,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sceneName: 0.TitleScene
-  bgm: {fileID: 11400000, guid: 9ad5a85555b77ed42aa1bd7375b4abba, type: 2}
+  bgm:
+    m_AssetGUID: 9ad5a85555b77ed42aa1bd7375b4abba
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
   duration: 4
 --- !u!1 &7400035715187681486
 GameObject:

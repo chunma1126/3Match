@@ -36,6 +36,9 @@ public class UIManager : MonoSingleton<UIManager>
         
     private void ChangeScoreText(float value)
     {
+        if (this == null) 
+            return;
+        
         if (scoreRoutine != null)
             StopCoroutine(scoreRoutine);
         

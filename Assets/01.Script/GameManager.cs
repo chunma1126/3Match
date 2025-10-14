@@ -4,6 +4,7 @@ using UnityEngine;
 [DontDestroyOnLoad]
 public class GameManager : MonoSingleton<GameManager>
 {
+        
     public const string MAX_SCORE_SAVE_KEY = "MaxScore";
     
     [SerializeField] private float defaultMoveCount = 50;
@@ -17,11 +18,10 @@ public class GameManager : MonoSingleton<GameManager>
     protected override void Awake()
     {
         base.Awake();
-
+                        
         moveCounter = new Counter();
-        scoreCounter  = new Counter();
-       
-        
+        scoreCounter = new Counter();
+                
         maxScore = PlayerPrefs.GetInt(GameManager.MAX_SCORE_SAVE_KEY);
         
         Application.targetFrameRate = 60;

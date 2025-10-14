@@ -1,44 +1,49 @@
+using UnityEngine.AddressableAssets;
+using System.Threading.Tasks;
 using DG.Tweening;
-using DG.Tweening.Core.Enums;
 using UnityEngine;
-
 
 public class ItemController : MonoBehaviour
 {
-
-    [SerializeField] private LevelDataContainer levelDataContainer;
+    [SerializeField] private AssetReference levelDataContainerRef;
     
     [Space]
-    [SerializeField] private ColorDataContainer colorDataContainer;
-    [SerializeField] private Item item;
-
+    [SerializeField] private AssetReferenceColorDataContainer colorDataContainer;
+    [SerializeField] private AssetReferenceGameObject itemAssetReference;
+    
     private Tile[] tiles;
+    private ColorDataContainer cachedData;
         
-    public void Init(Tile[] tiles)
+    public async void Init(Tile[] tiles)
     {
         this.tiles = tiles;
+        cachedData = await AssetManager.LoadAsync<ColorDataContainer>(colorDataContainer);
     }
-    
-    public Tween CreateItem()
+      
+    public async Task<Tween> CreateItem()
     {
+        var levelDataList = await AssetManager.LoadAsync<LevelDataContainer>(levelDataContainerRef);
+        var levelDataRef = levelDataList.Get();
+        var levelDataAsset = await AssetManager.LoadAsync<LevelData>(levelDataRef);
+        
         Tween tween = null;
         int index = 0;
         
-        LevelData levelData = levelDataContainer.Get();
         foreach (var currentTile in tiles)
         {
             Vector2 spawnPos = currentTile.transform.position;
             
-            Item currentItem = Instantiate(item, spawnPos, Quaternion.identity);
-            tween = currentItem.SetData(levelData.colorDataList[index++]);
+            var itemRef = await AssetManager.LoadAsync<GameObject>(itemAssetReference); 
+            Item currentItem = Instantiate(itemRef, spawnPos, Quaternion.identity).GetComponent<Item>();
             
+            tween = currentItem.SetData(levelDataAsset.colorDataList[index++]);
             currentTile.CurrentItem = currentItem;
         }
         
         return tween;
     }
     
-    public Tween RefillItem()
+    public async Task<Tween> RefillItem()
     {
         Tween tween = null;
         foreach (var currentTile in tiles)
@@ -72,11 +77,10 @@ public class ItemController : MonoBehaviour
         return seq;
     }
     
-    
     private Tween SetRandomItem(Item item)
     {
-        int randIndex = Random.Range(0, colorDataContainer.itemList.Length);
-        return item.SetData(colorDataContainer.itemList[randIndex]);
+        int randIndex = Random.Range(0, cachedData.itemList.Length);
+        return item.SetData(cachedData.itemList[randIndex]);
     }
-        
+    
 }

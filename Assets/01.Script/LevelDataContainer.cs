@@ -1,11 +1,12 @@
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 [CreateAssetMenu(menuName = "SO/LevelDataContainer")]
 public class LevelDataContainer : ScriptableObject
 {
-    public LevelData[] levelDataList;
+    public AssetReference[] levelDataList;
     
-    public LevelData Get()
+    public AssetReference Get()
     {
         if (levelDataList == null || levelDataList.Length == 0)
         {
