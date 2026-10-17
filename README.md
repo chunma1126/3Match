@@ -7,13 +7,13 @@
 </aside>
 
 <p align="left">
-  <img src="Image/스크린샷_1.png" alt="3Match 이미지1" width="250"/>
-  <img src="Image/스크린샷_2.png" alt="3Match 이미지2" width="250"/>
-  <img src="Image/스크린샷_3.png" alt="3Match 이미지3" width="250"/>
+  <img src="Image/스크린샷_1.webp" alt="3Match 이미지1" width="250"/>
+  <img src="Image/스크린샷_2.webp" alt="3Match 이미지2" width="250"/>
+  <img src="Image/스크린샷_3.webp" alt="3Match 이미지3" width="250"/>
 </p>
 
-🔗 [유튜브](#)  
-🔗 [문서](#)  
+🔗 [유튜브](https://www.youtube.com/watch?v=BotbQtM0h7g&t=1s)  
+🔗 [문서](https://abaft-yarn-52e.notion.site/KukuPang-247c32f2552880ddab12c5a2c0570950?pvs=74)  
 
 | 항목 | 내용 |
 | --- | --- |
